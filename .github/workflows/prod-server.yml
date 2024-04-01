@@ -19,6 +19,12 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
+      - name: Make Application-prod.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-prod.yml
+          echo "${{ secrets.APPLICATION_PROD}}" > ./application-prod.yml
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
