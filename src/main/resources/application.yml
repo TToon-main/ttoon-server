@@ -1,4 +1,5 @@
 spring:
   profiles:
     include: dev, local, prod
-    active: dev
+    active: prod
+
