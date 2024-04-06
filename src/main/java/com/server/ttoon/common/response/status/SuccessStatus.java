@@ -1,4 +1,4 @@
-package com.server.ttoon.common.response;
+package com.server.ttoon.common.response.status;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
