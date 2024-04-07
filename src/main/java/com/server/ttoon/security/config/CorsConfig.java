@@ -1,4 +1,4 @@
-package com.server.ttoon.jwt.config;
+package com.server.ttoon.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
