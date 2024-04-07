@@ -1,5 +1,6 @@
 package com.server.ttoon.security.jwt.filter;
 
+import com.server.ttoon.security.jwt.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
