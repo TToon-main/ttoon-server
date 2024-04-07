@@ -14,7 +14,7 @@ public class CustomExceptionAdvice {
     @ExceptionHandler(CustomRuntimeException.class)
     public ResponseEntity<ApiResponse<Object>> handleCustomRuntimeException(CustomRuntimeException ex) {
         ErrorStatus errorStatus = ex.getStatus();
-        ApiResponse<Object> response = ApiResponse.onFailure(errorStatus.getCode(), errorStatus.getMessage());
+        ApiResponse<Object> response = ApiResponse.onFailure(errorStatus);
         return ResponseEntity.status(errorStatus.getHttpStatus()).body(response);
     }
 }
