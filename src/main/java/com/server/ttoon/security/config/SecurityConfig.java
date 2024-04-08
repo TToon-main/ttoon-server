@@ -3,6 +3,7 @@ package com.server.ttoon.security.config;
 import com.server.ttoon.security.jwt.TokenProvider;
 import com.server.ttoon.security.jwt.filter.JwtAccessDeniedHandler;
 import com.server.ttoon.security.jwt.filter.JwtAuthenticationEntryPoint;
+import com.server.ttoon.security.oauth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().permitAll()) //우선 모든요청 permitAll
+                .oauth2Login(oauth2Login ->
+                        oauth2Login.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(principalOauth2UserService)))
                 .exceptionHandling((auth)->
                         auth.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeniedHandler))
                 .with(new JwtSecurityConfig(tokenProvider), c-> c.getClass())
