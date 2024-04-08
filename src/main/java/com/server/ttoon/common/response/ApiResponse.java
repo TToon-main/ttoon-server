@@ -2,6 +2,7 @@ package com.server.ttoon.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,10 +27,10 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, status.getCode(), status.getMessage(), null);
     }
     // 실패한 경우 응답 생성
-    public static <T> ApiResponse<T> onFailure(String code, String message, T data) {
-        return new ApiResponse<>(false, code, message, data);
+    public static <T> ApiResponse<T> onFailure(ErrorStatus status, T data) {
+        return new ApiResponse<>(false, status.getCode(), status.getMessage(), data);
     }
-    public static <T> ApiResponse<T> onFailure(String code, String message) {
-        return new ApiResponse<>(false, code, message, null);
+    public static <T> ApiResponse<T> onFailure(ErrorStatus status) {
+        return new ApiResponse<>(false, status.getCode(), status.getMessage(), null);
     }
 }
