@@ -18,7 +18,6 @@ public class ApiResponse<T> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
-
     // 성공한 경우 응답 생성
     public static <T> ApiResponse<T> onSuccess(SuccessStatus status, T result) {
         return new ApiResponse<>(true, status.getCode(), status.getMessage(), result);
