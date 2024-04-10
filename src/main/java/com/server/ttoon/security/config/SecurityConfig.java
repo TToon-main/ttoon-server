@@ -71,10 +71,7 @@ public class SecurityConfig {
             // PrincipalDetails로 캐스팅하여 인증된 사용자 정보를 가져온다.
             PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
 
-            boolean isGuest = false;
-            if(principal.getMember().getAuthority().equals(Authority.ROLE_GUEST))
-                isGuest = true;
-
+            boolean isGuest = principal.getMember().getAuthority().equals(Authority.ROLE_GUEST) ? true : false;
             // jwt token 발행을 시작한다.
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
