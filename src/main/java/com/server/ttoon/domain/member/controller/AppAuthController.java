@@ -1,9 +1,9 @@
-package com.server.ttoon.controller;
+package com.server.ttoon.domain.member.controller;
 
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.member.dto.request.AppJoinReqDto;
 import com.server.ttoon.domain.member.dto.request.AppLoginReqDto;
-import com.server.ttoon.service.AppAuthService;
+import com.server.ttoon.domain.member.service.AppAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

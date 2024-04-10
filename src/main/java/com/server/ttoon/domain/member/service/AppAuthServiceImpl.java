@@ -1,4 +1,4 @@
-package com.server.ttoon.service;
+package com.server.ttoon.domain.member.service;
 
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.SuccessStatus;
@@ -14,7 +14,6 @@ import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.TokenProvider;
 import com.server.ttoon.security.jwt.dto.TokenDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,7 +22,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
