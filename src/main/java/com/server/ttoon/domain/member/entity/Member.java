@@ -20,6 +20,6 @@ public class Member extends BaseEntity {
     private Authority authority;
     @Enumerated(EnumType.STRING)
     private Provider provider;
-    private Long providerId;
+    private String providerId;
     private String nickName;
 }
