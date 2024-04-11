@@ -31,7 +31,7 @@ public class AppAuthServiceImpl implements AppAuthService{
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
 
-    // 회원가입할 때 로직. (이용 약관 동의 후)
+    // 이용 약관 동의 후 회원가입 로직, 권한 ROLE_USER 로 변경
     public ResponseEntity<ApiResponse<?>> join(AppAuthReqDto appAuthReqDto){
 
         String provider = appAuthReqDto.getProvider();
@@ -69,7 +69,7 @@ public class AppAuthServiceImpl implements AppAuthService{
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._CREATED, appJoinResDto));
     }
 
-    // 로그인하기 버튼 눌렀을 때 실행.
+    // 로그인하기 버튼 눌렀을 때 실행. 이미 회원이면 토큰 생성 후 반환, 회원 아니면 멤버 GUEST로 저장 후 토큰 생성, 반환.
     public ResponseEntity<ApiResponse<?>> login(AppAuthReqDto appAuthReqDto){
 
         // provider 와 providerId 를 이용해 유저 찾기.
