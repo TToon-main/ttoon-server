@@ -36,7 +36,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         String provider = oAuth2UserInfo.getProvider().toUpperCase();
         String providerId = oAuth2UserInfo.getProviderId();
 
-        Member member = memberRepository.findByProviderAndProviderId(provider,providerId);
+        Member member = memberRepository.findByProviderAndProviderId(Provider.valueOf(provider),providerId);
 
         if(member == null)
         {
