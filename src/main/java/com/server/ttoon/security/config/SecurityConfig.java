@@ -103,14 +103,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
-        configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용
         configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
         configuration.addExposedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
