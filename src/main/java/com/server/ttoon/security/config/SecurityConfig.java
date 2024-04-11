@@ -103,6 +103,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
         configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용
