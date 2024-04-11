@@ -1,9 +1,9 @@
 package com.server.ttoon.domain.member.service;
 
 import com.server.ttoon.common.response.ApiResponse;
+import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
-import com.server.ttoon.domain.member.dto.request.AppJoinReqDto;
-import com.server.ttoon.domain.member.dto.request.AppLoginReqDto;
+import com.server.ttoon.domain.member.dto.request.AppAuthReqDto;
 import com.server.ttoon.domain.member.dto.response.AppJoinResDto;
 import com.server.ttoon.domain.member.dto.response.AppLoginResDto;
 import com.server.ttoon.domain.member.entity.Authority;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +31,22 @@ public class AppAuthServiceImpl implements AppAuthService{
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
 
-    public ResponseEntity<ApiResponse<?>> join(AppJoinReqDto appJoinReqDto){
+    // 회원가입할 때 로직. (이용 약관 동의 후)
+    public ResponseEntity<ApiResponse<?>> join(AppAuthReqDto appAuthReqDto){
 
-        Member member = Member.builder()
-                .nickName(appJoinReqDto.getNickName())
-                .provider(appJoinReqDto.getProvider())
-                .providerId(appJoinReqDto.getProviderId())
+        String provider = appAuthReqDto.getProvider();
+        String providerId = appAuthReqDto.getProviderId();
+        Member member = memberRepository.findByProviderAndProviderId(provider, providerId);
+
+        if(member == null){
+            return ResponseEntity.ok(ApiResponse.onFailure(ErrorStatus.MEMBER_NOT_FOUND));
+        }
+
+        // 권한 ROLE_USER 로 변경
+        member = Member.builder()
                 .authority(Authority.ROLE_USER)
                 .build();
+
         // 새로운 회원 저장.
         memberRepository.save(member);
 
@@ -62,26 +69,44 @@ public class AppAuthServiceImpl implements AppAuthService{
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._CREATED, appJoinResDto));
     }
 
-    public ResponseEntity<ApiResponse<?>> login(AppLoginReqDto appLoginReqDto){
+    // 로그인하기 버튼 눌렀을 때 실행.
+    public ResponseEntity<ApiResponse<?>> login(AppAuthReqDto appAuthReqDto){
 
         // provider 와 providerId 를 이용해 유저 찾기.
-        Provider provider = appLoginReqDto.getProvider();
-        Long providerId = appLoginReqDto.getProviderId();
-        Optional<Member> optionalMember = memberRepository.findByProviderAndProviderId(provider, providerId);
+        String provider = appAuthReqDto.getProvider();
+        String providerId = appAuthReqDto.getProviderId();
+        Member member = memberRepository.findByProviderAndProviderId(provider, providerId);
 
         AppLoginResDto appLoginResDto;
 
-        // 리포지토리에 해당 유저가 존재하지 않으면 회원가입 메소드 진입.
-        if(optionalMember.isEmpty()){
-            // isExist = false -> 회원이 아니다.
-           appLoginResDto = AppLoginResDto.builder()
-                   .isExist(false)
-                   .build();
+        // 회원이 아니면 권한 ROLE_GUEST 부여해서 디비 저장하고 반환.
+        if(member == null){
 
-           return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, appLoginResDto));
+            Member newMember = Member.builder()
+                    .provider(Provider.valueOf(appAuthReqDto.getProvider()))
+                    .providerId(appAuthReqDto.getProviderId())
+                    .nickName("고양이")
+                    .authority(Authority.ROLE_GUEST)
+                    .build();
+
+            // 토큰 생성 로직
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(member.getAuthority().toString()));
+
+            PrincipalDetails memberDetails = new PrincipalDetails(member);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, "", authorities);
+
+            TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+            // isGuest = true -> 게스트 (아직 회원아님)
+            appLoginResDto = AppLoginResDto.builder()
+                    .tokenDto(tokenDto)
+                    .isGuest(true)
+                    .build();
+
+
+            return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, appLoginResDto));
         }
-
-        Member member = optionalMember.get();
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(member.getAuthority().toString()));
@@ -92,7 +117,7 @@ public class AppAuthServiceImpl implements AppAuthService{
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
         appLoginResDto = AppLoginResDto.builder()
-                .isExist(true)
+                .isGuest(false)
                 .tokenDto(tokenDto)
                 .build();
 

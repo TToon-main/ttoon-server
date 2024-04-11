@@ -9,6 +9,6 @@ import lombok.Data;
 public class AppLoginResDto {
 
     private TokenDto tokenDto;
-    private Boolean isExist; // 회원인지 아닌지
+    private Boolean isGuest; // 회원인지 아닌지
 }
 

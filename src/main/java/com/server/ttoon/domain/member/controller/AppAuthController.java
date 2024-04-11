@@ -1,8 +1,7 @@
 package com.server.ttoon.domain.member.controller;
 
 import com.server.ttoon.common.response.ApiResponse;
-import com.server.ttoon.domain.member.dto.request.AppJoinReqDto;
-import com.server.ttoon.domain.member.dto.request.AppLoginReqDto;
+import com.server.ttoon.domain.member.dto.request.AppAuthReqDto;
 import com.server.ttoon.domain.member.service.AppAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +14,15 @@ public class AppAuthController {
 
     private final AppAuthService appAuthService;
 
-    @PostMapping("/kakao")
-    public ResponseEntity<ApiResponse<?>> kakaoLogin(@RequestBody AppLoginReqDto appLoginReqDto){
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<?>> appLogin(@RequestBody AppAuthReqDto appAuthReqDto){
 
-        return appAuthService.login(appLoginReqDto);
+        return appAuthService.login(appAuthReqDto);
     }
 
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<?>> join(@RequestBody AppJoinReqDto appJoinReqDto){
+    public ResponseEntity<ApiResponse<?>> appJoin(@RequestBody AppAuthReqDto appAuthReqDto){
 
-        return appAuthService.join(appJoinReqDto);
+        return appAuthService.join(appAuthReqDto);
     }
 }
