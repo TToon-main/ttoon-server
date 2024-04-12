@@ -60,9 +60,10 @@ public class AppAuthServiceImpl implements AppAuthService{
         RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).orElse(null);
         if(existRefreshToken == null)
             refreshTokenRepository.save(refreshToken);
-        else
+        else {
             existRefreshToken.updateValue(tokenDto.getRefreshToken());
-
+            refreshTokenRepository.save(existRefreshToken);
+        }
         OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                 .accessToken(tokenDto.getAccessToken())
                 .refreshToken(tokenDto.getRefreshToken())
@@ -134,9 +135,10 @@ public class AppAuthServiceImpl implements AppAuthService{
         RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).orElse(null);
         if(existRefreshToken == null)
             refreshTokenRepository.save(refreshToken);
-        else
+        else {
             existRefreshToken.updateValue(tokenDto.getRefreshToken());
-
+            refreshTokenRepository.save(existRefreshToken);
+        }
         OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                 .accessToken(tokenDto.getAccessToken())
                 .refreshToken(tokenDto.getRefreshToken())

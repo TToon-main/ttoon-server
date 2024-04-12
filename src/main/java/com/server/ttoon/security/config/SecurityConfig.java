@@ -89,8 +89,10 @@ public class SecurityConfig {
             RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(principal.getUsername()).orElse(null);
             if(existRefreshToken == null)
                 refreshTokenRepository.save(refreshToken);
-            else
+            else {
                 existRefreshToken.updateValue(tokenDto.getRefreshToken());
+                refreshTokenRepository.save(existRefreshToken);
+            }
 
             OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                     .accessToken(tokenDto.getAccessToken())
