@@ -1,5 +1,6 @@
 package com.server.ttoon.security.jwt;
 
+import com.server.ttoon.domain.member.entity.Authority;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.dto.response.TokenDto;
@@ -81,10 +82,18 @@ public class TokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
+        Authority authority;
+        if(authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN")))
+            authority = ROLE_ADMIN;
+        else if(authorities.contains(new SimpleGrantedAuthority("ROLE_USER")))
+            authority = ROLE_USER;
+        else
+            authority = ROLE_GUEST;
+
         // UserDetails 객체를 만들어서 Authentication 리턴
         Member member = Member.builder()
                 .id(Long.parseLong(claims.getSubject()))
-                .authority(authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN")) ? ROLE_ADMIN : ROLE_USER)
+                .authority(authority)
                 .build();
         UserDetails principal = new PrincipalDetails(member);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
