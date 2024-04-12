@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository <Member, Long> {
 
-    Member findByProviderAndProviderId(String provider, String providerId);
 
+   Member findByProviderAndProviderId(Provider provider, String providerId);
+ 
 }

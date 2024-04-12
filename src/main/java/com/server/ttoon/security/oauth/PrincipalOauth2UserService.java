@@ -24,7 +24,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
-        System.out.println("=======================================================================-=====");
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         OAuth2UserInfo oAuth2UserInfo = null;
@@ -36,7 +35,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         String provider = oAuth2UserInfo.getProvider().toUpperCase();
         String providerId = oAuth2UserInfo.getProviderId();
 
-        Member member = memberRepository.findByProviderAndProviderId(provider,providerId);
+        Member member = memberRepository.findByProviderAndProviderId(Provider.valueOf(provider),providerId);
 
         if(member == null)
         {
