@@ -11,6 +11,8 @@ import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.TokenProvider;
 import com.server.ttoon.security.jwt.dto.response.OAuth2LoginResDto;
 import com.server.ttoon.security.jwt.dto.response.TokenDto;
+import com.server.ttoon.security.jwt.entity.RefreshToken;
+import com.server.ttoon.security.jwt.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +32,7 @@ public class AppAuthServiceImpl implements AppAuthService{
 
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     // 이용 약관 동의 후 회원가입 로직, 권한 ROLE_USER 로 변경
     @Transactional
@@ -48,6 +51,17 @@ public class AppAuthServiceImpl implements AppAuthService{
 
         // authentication 으로 Accesstoken, Refreshtoken 생성.
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .memberId(memberDetails.getUsername())
+                .value(tokenDto.getRefreshToken())
+                .build();
+
+        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).get();
+        if(existRefreshToken == null)
+            refreshTokenRepository.save(refreshToken);
+        else
+            existRefreshToken.updateValue(tokenDto.getRefreshToken());
 
         OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                 .accessToken(tokenDto.getAccessToken())
@@ -88,6 +102,12 @@ public class AppAuthServiceImpl implements AppAuthService{
 
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .memberId(memberDetails.getUsername())
+                    .value(tokenDto.getRefreshToken())
+                    .build();
+            refreshTokenRepository.save(refreshToken);
+
             // isGuest = true -> 게스트 (아직 회원아님)
             OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                     .accessToken(tokenDto.getAccessToken())
@@ -105,6 +125,17 @@ public class AppAuthServiceImpl implements AppAuthService{
         Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, "", authorities);
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .memberId(memberDetails.getUsername())
+                .value(tokenDto.getRefreshToken())
+                .build();
+
+        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).get();
+        if(existRefreshToken == null)
+            refreshTokenRepository.save(refreshToken);
+        else
+            existRefreshToken.updateValue(tokenDto.getRefreshToken());
 
         OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                 .accessToken(tokenDto.getAccessToken())
