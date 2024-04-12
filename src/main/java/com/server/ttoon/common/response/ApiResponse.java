@@ -1,6 +1,7 @@
 package com.server.ttoon.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
@@ -31,5 +32,17 @@ public class ApiResponse<T> {
     }
     public static <T> ApiResponse<T> onFailure(ErrorStatus status) {
         return new ApiResponse<>(false, status.getCode(), status.getMessage(), null);
+    }
+    @JsonProperty("isSuccess")
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+    @JsonProperty("code")
+    public String getCode() {
+        return code;
+    }
+    @JsonProperty("message")
+    public String getMessage() {
+        return message;
     }
 }

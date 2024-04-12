@@ -1,16 +1,29 @@
 package com.server.ttoon.security.jwt.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.*;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@JsonPropertyOrder({"isGuest", "accessToken", "refreshToken"})
 @Builder
 public class OAuth2LoginResponseDto {
     private String accessToken;
     private String refreshToken;
     private boolean isGuest;
+
+    @JsonProperty("isGuest")
+    public boolean isGuest(){
+        return isGuest;
+    }
+    @JsonProperty("accessToken")
+    public String getAccessToken(){
+        return accessToken;
+    }
+    @JsonProperty("refreshToken")
+    public String getRefreshToken(){
+        return refreshToken;
+    }
 }
