@@ -70,7 +70,6 @@ public class SecurityConfig {
         return http.build();
     }
     @Bean
-    @Transactional
     public AuthenticationSuccessHandler successHandler() {
         return (request, response, authentication) -> {
             // PrincipalDetails로 캐스팅하여 인증된 사용자 정보를 가져온다.
