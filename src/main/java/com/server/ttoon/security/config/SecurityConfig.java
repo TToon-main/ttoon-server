@@ -8,8 +8,10 @@ import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.TokenProvider;
 import com.server.ttoon.security.jwt.dto.response.OAuth2LoginResDto;
 import com.server.ttoon.security.jwt.dto.response.TokenDto;
+import com.server.ttoon.security.jwt.entity.RefreshToken;
 import com.server.ttoon.security.jwt.filter.JwtAccessDeniedHandler;
 import com.server.ttoon.security.jwt.filter.JwtAuthenticationEntryPoint;
+import com.server.ttoon.security.jwt.repository.RefreshTokenRepository;
 import com.server.ttoon.security.oauth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -36,6 +39,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final PrincipalOauth2UserService principalOauth2UserService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -66,6 +70,7 @@ public class SecurityConfig {
         return http.build();
     }
     @Bean
+    @Transactional
     public AuthenticationSuccessHandler successHandler() {
         return (request, response, authentication) -> {
             // PrincipalDetails로 캐스팅하여 인증된 사용자 정보를 가져온다.
@@ -77,6 +82,16 @@ public class SecurityConfig {
 
             // jwt token 발행을 시작한다.
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .memberId(principal.getUsername())
+                    .value(tokenDto.getRefreshToken())
+                    .build();
+            RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(principal.getUsername()).get();
+            if(existRefreshToken == null)
+                refreshTokenRepository.save(refreshToken);
+            else
+                existRefreshToken.updateValue(tokenDto.getRefreshToken());
 
             OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                     .accessToken(tokenDto.getAccessToken())
