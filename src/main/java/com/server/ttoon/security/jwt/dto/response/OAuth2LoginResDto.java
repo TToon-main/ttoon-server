@@ -1,4 +1,4 @@
-package com.server.ttoon.security.jwt.dto;
+package com.server.ttoon.security.jwt.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @JsonPropertyOrder({"isGuest", "accessToken", "refreshToken"})
 @Builder
-public class OAuth2LoginResponseDto {
+public class OAuth2LoginResDto {
     private String accessToken;
     private String refreshToken;
     private boolean isGuest;

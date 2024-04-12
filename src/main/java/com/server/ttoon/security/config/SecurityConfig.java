@@ -6,8 +6,8 @@ import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.member.entity.Authority;
 import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.TokenProvider;
-import com.server.ttoon.security.jwt.dto.OAuth2LoginResponseDto;
-import com.server.ttoon.security.jwt.dto.TokenDto;
+import com.server.ttoon.security.jwt.dto.response.OAuth2LoginResDto;
+import com.server.ttoon.security.jwt.dto.response.TokenDto;
 import com.server.ttoon.security.jwt.filter.JwtAccessDeniedHandler;
 import com.server.ttoon.security.jwt.filter.JwtAuthenticationEntryPoint;
 import com.server.ttoon.security.oauth.PrincipalOauth2UserService;
@@ -78,14 +78,14 @@ public class SecurityConfig {
             // jwt token 발행을 시작한다.
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-            OAuth2LoginResponseDto oAuth2LoginResponseDto = OAuth2LoginResponseDto.builder()
+            OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                     .accessToken(tokenDto.getAccessToken())
                     .refreshToken(tokenDto.getRefreshToken())
                     .isGuest(isGuest)
                     .build();
 
             ObjectMapper objectMapper = new ObjectMapper();
-            ApiResponse<OAuth2LoginResponseDto> apiResponse = ApiResponse.onSuccess(SuccessStatus._OK, oAuth2LoginResponseDto);
+            ApiResponse<OAuth2LoginResDto> apiResponse = ApiResponse.onSuccess(SuccessStatus._OK, oAuth2LoginResDto);
             // JSON 직렬화
             String jsonResponse = objectMapper.writeValueAsString(apiResponse);
 

@@ -1,7 +1,6 @@
 package com.server.ttoon.domain.member.dto.response;
 
-import com.server.ttoon.domain.member.entity.Authority;
-import com.server.ttoon.security.jwt.dto.TokenDto;
+import com.server.ttoon.security.jwt.dto.response.TokenDto;
 import lombok.Builder;
 import lombok.Data;
 

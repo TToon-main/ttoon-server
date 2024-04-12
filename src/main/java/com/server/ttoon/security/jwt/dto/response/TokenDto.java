@@ -1,4 +1,4 @@
-package com.server.ttoon.security.jwt.dto;
+package com.server.ttoon.security.jwt.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

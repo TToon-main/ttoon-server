@@ -2,7 +2,7 @@ package com.server.ttoon.security.jwt;
 
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.security.auth.PrincipalDetails;
-import com.server.ttoon.security.jwt.dto.TokenDto;
+import com.server.ttoon.security.jwt.dto.response.TokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

@@ -22,4 +22,8 @@ public class Member extends BaseEntity {
     private Provider provider;
     private String providerId;
     private String nickName;
+
+    public void changeToUser(){
+        this.authority = Authority.ROLE_USER;
+    }
 }
