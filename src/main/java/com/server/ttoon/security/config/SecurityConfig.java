@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().permitAll()) //우선 모든요청 permitAll
+                        .anyRequest().authenticated())
                 .oauth2Login(oauth2Login ->
                         oauth2Login.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(principalOauth2UserService)))
                 .oauth2Login(handler -> handler.successHandler(successHandler()))
