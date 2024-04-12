@@ -37,7 +37,7 @@ public class JwtServiceImpl implements JwtService{
         PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
 
         String memberId = principalDetails.getUsername();
-        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberId).get();
+        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberId).orElse(null);
         if(existRefreshToken == null)
             throw new CustomRuntimeException(BADREQUEST_ERROR);
         // 3. DB에 매핑 되어있는 Member ID(key)와 Vaule값이 같지않으면 에러 리턴

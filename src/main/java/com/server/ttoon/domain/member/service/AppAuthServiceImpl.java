@@ -59,7 +59,7 @@ public class AppAuthServiceImpl implements AppAuthService{
                 .value(tokenDto.getRefreshToken())
                 .build();
 
-        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).get();
+        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).orElse(null);
         if(existRefreshToken == null)
             refreshTokenRepository.save(refreshToken);
         else
@@ -131,7 +131,7 @@ public class AppAuthServiceImpl implements AppAuthService{
                 .value(tokenDto.getRefreshToken())
                 .build();
 
-        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).get();
+        RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(memberDetails.getUsername()).orElse(null);
         if(existRefreshToken == null)
             refreshTokenRepository.save(refreshToken);
         else

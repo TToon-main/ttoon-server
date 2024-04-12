@@ -87,7 +87,7 @@ public class SecurityConfig {
                     .memberId(principal.getUsername())
                     .value(tokenDto.getRefreshToken())
                     .build();
-            RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(principal.getUsername()).get();
+            RefreshToken existRefreshToken = refreshTokenRepository.findByMemberId(principal.getUsername()).orElse(null);
             if(existRefreshToken == null)
                 refreshTokenRepository.save(refreshToken);
             else
