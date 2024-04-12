@@ -40,6 +40,7 @@ public class AppAuthServiceImpl implements AppAuthService{
 
         // 권한 ROLE_USER 로 변경
         member.changeToUser();
+        memberRepository.save(member);
 
         // authorities 추출.
         List<GrantedAuthority> authorities = new ArrayList<>();
