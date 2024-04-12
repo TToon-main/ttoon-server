@@ -39,7 +39,7 @@ public class AppAuthServiceImpl implements AppAuthService{
     public ResponseEntity<ApiResponse<?>> join(Member member){
 
         // 권한 ROLE_USER 로 변경
-        member.changeToUser();
+        member.changeToUser(member);
         memberRepository.save(member);
 
         // authorities 추출.

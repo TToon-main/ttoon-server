@@ -23,7 +23,10 @@ public class Member extends BaseEntity {
     private String providerId;
     private String nickName;
 
-    public void changeToUser(){
+    public void changeToUser(Member member){
         this.authority = Authority.ROLE_USER;
+        this.provider = member.getProvider();
+        this.providerId = member.getProviderId();
+        this.nickName = member.getNickName();
     }
 }
