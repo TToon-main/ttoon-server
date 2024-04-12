@@ -1,10 +1,8 @@
 package com.server.ttoon.domain.member.service;
 
 import com.server.ttoon.common.response.ApiResponse;
-import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.security.jwt.dto.request.OAuth2LoginReqDto;
-import com.server.ttoon.domain.member.dto.response.AppJoinResDto;
 import com.server.ttoon.domain.member.entity.Authority;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.entity.Provider;
@@ -92,6 +90,8 @@ public class AppAuthServiceImpl implements AppAuthService{
                     .nickName(provider + "_" + providerId)
                     .authority(Authority.ROLE_GUEST)
                     .build();
+
+             memberRepository.save(member);
 
             // 토큰 생성 로직
             List<GrantedAuthority> authorities = new ArrayList<>();
