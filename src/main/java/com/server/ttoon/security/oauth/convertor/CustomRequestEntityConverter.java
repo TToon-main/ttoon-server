@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,7 +78,8 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
         InputStream in = resource.getInputStream();
         PEMParser pemParser = new PEMParser(new StringReader(IOUtils.toString(in, StandardCharsets.UTF_8)));
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        System.out.println("object = " + object);
+        byte[] privateKeyBytes = object.getEncoded();
+        System.out.println("Private Key Encoded: " + Arrays.toString(privateKeyBytes));
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         return converter.getPrivateKey(object);
     }
