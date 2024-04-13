@@ -16,4 +16,9 @@ public class KakaoUserInfo implements OAuth2UserInfo{
     public String getProvider() {
         return "kakao";
     }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
 }
