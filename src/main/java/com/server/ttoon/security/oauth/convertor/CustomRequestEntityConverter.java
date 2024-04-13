@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.Converter;
 
+import com.server.ttoon.common.exception.CustomRuntimeException;
+import com.server.ttoon.common.response.status.ErrorStatus;
 import io.jsonwebtoken.Jwts;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -18,6 +20,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -67,11 +70,17 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 
         ClassPathResource resource = new ClassPathResource(path);
 
-        InputStream in = resource.getInputStream();
-        PEMParser pemParser = new PEMParser(new StringReader(IOUtils.toString(in, StandardCharsets.UTF_8)));
-        PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-        return converter.getPrivateKey(object);
+        try {
+            InputStream in = resource.getInputStream();
+            PEMParser pemParser = new PEMParser(new StringReader(IOUtils.toString(in, StandardCharsets.UTF_8)));
+            PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            return converter.getPrivateKey(object);
+            // 파일 처리 로직
+        } catch (FileNotFoundException e) {
+            // 파일이 없을 경우의 처리 로직
+            throw new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR);
+        }
     }
 
     public String createClientSecret() throws IOException {
