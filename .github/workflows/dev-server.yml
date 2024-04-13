@@ -22,7 +22,12 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application-dev.yml
-          echo "${{ secrets.APPLICATION_DEV}}" > ./application-dev.yml    
+          echo "${{ secrets.APPLICATION_DEV}}" > ./application-dev.yml   
+
+      - name: Make .p8 file
+        run: |
+          mkdir -p ./src/main/resources/static/apple
+          echo "${{ secrets.APPLE_P8 }}" > ./src/main/resources/static/apple/AuthKey_DGZV373BBT.p8
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
