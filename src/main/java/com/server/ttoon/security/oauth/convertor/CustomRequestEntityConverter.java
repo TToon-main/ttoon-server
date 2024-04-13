@@ -3,6 +3,7 @@ package com.server.ttoon.security.oauth.convertor;
 
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -94,7 +95,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
                 .setExpiration(expirationDate) // 만료 시간
                 .setAudience(url)
                 .setSubject(clientId)
-                .signWith(getPrivateKey())
+                .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
                 .compact();
     }
 }
