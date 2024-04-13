@@ -63,6 +63,12 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
                 entity.getMethod(), entity.getUrl());
     }
     public PrivateKey getPrivateKey() throws IOException {
+
+        System.out.println("===================================================");
+        System.out.println("====================================================");
+        System.out.println("path = " + path);
+        System.out.println("===================================================");
+        System.out.println("====================================================");
         ClassPathResource resource = new ClassPathResource(path);
 
         InputStream in = resource.getInputStream();
