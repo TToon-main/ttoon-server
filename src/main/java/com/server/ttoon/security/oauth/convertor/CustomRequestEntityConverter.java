@@ -83,7 +83,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
     }
 
     public String createClientSecret() throws IOException {
-        Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+        //Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         Map<String, Object> jwtHeader = new HashMap<>();
         jwtHeader.put("kid", keyId);
         jwtHeader.put("alg", "ES256");
@@ -92,7 +92,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
                 .setHeaderParams(jwtHeader)
                 .setIssuer(teamId)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
-                .setExpiration(expirationDate) // 만료 시간
+                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 5)))// 만료 시간
                 .setAudience(url)
                 .setSubject(clientId)
                 .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
