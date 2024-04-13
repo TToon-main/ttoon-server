@@ -30,23 +30,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 @Getter
+@Component
 public class CustomRequestEntityConverter implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>>, org.springframework.core.convert.converter.Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
-    private OAuth2AuthorizationCodeGrantRequestEntityConverter defaultConverter;
-    @Value("${apple.path}")
-    private String path;
-    @Value("${apple.kid}")
-    private String keyId;
-    @Value("${apple.tid}")
-    private String teamId;
-    @Value("${apple.cid}")
-    private String clientId;
-    @Value("${apple.url}")
-    private String url;
+    private final OAuth2AuthorizationCodeGrantRequestEntityConverter defaultConverter;
+    private final String path;
+    private final String keyId;
+    private final String teamId;
+    private final String clientId;
+    private final String url;
 
-    public CustomRequestEntityConverter() {
-        defaultConverter = new OAuth2AuthorizationCodeGrantRequestEntityConverter();
+    public CustomRequestEntityConverter(AppleProperties properties) {
+        this.defaultConverter = new OAuth2AuthorizationCodeGrantRequestEntityConverter();
+        this.path = properties.getPath();
+        this.keyId = properties.getKid();
+        this.teamId = properties.getTid();
+        this.clientId = properties.getCid();
+        this.url = properties.getUrl();
     }
     @Override
     public RequestEntity<?> convert(OAuth2AuthorizationCodeGrantRequest req) {

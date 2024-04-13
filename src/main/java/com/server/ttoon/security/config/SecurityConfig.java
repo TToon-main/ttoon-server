@@ -13,6 +13,7 @@ import com.server.ttoon.security.jwt.filter.JwtAccessDeniedHandler;
 import com.server.ttoon.security.jwt.filter.JwtAuthenticationEntryPoint;
 import com.server.ttoon.security.jwt.repository.RefreshTokenRepository;
 import com.server.ttoon.security.oauth.PrincipalOauth2UserService;
+import com.server.ttoon.security.oauth.convertor.AppleProperties;
 import com.server.ttoon.security.oauth.convertor.CustomRequestEntityConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,17 +42,22 @@ public class SecurityConfig {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final PrincipalOauth2UserService principalOauth2UserService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AppleProperties appleProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient() {
+    public DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient(CustomRequestEntityConverter customRequestEntityConverter) {
         DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
-        accessTokenResponseClient.setRequestEntityConverter(new CustomRequestEntityConverter());
+        accessTokenResponseClient.setRequestEntityConverter(customRequestEntityConverter);
 
         return accessTokenResponseClient;
+    }
+    @Bean
+    public CustomRequestEntityConverter customRequestEntityConverter() {
+        return new CustomRequestEntityConverter(appleProperties);
     }
 
     @Bean
@@ -67,7 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login((token) -> token.tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient())))
+                .oauth2Login((token) -> token.tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient(customRequestEntityConverter()))))
                 .oauth2Login(oauth2Login ->
                         oauth2Login.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(principalOauth2UserService)))
                 .oauth2Login(handler -> handler.successHandler(successHandler()))
