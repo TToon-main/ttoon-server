@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.Converter;
 
 import io.jsonwebtoken.Jwts;
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
@@ -30,18 +31,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Getter
 public class CustomRequestEntityConverter implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>>, org.springframework.core.convert.converter.Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
     private OAuth2AuthorizationCodeGrantRequestEntityConverter defaultConverter;
-    @Value("${apple.key-path}")
-    String path;
-    @Value("${apple.key-id}")
-    String keyId;
-    @Value("${apple.team-id}")
-    String teamId;
-    @Value("${apple.client-id}")
-    String clientId;
+    @Value("${apple.path}")
+    private String path;
+    @Value("${apple.kid}")
+    private String keyId;
+    @Value("${apple.tid}")
+    private String teamId;
+    @Value("${apple.cid}")
+    private String clientId;
     @Value("${apple.url}")
-    String url;
+    private String url;
 
     public CustomRequestEntityConverter() {
         defaultConverter = new OAuth2AuthorizationCodeGrantRequestEntityConverter();
