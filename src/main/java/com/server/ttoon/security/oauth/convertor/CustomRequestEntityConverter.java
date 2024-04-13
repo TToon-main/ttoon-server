@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -26,14 +25,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Component
-public class CustomRequestEntityConverter implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>>, org.springframework.core.convert.converter.Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
+public class CustomRequestEntityConverter implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
     private final OAuth2AuthorizationCodeGrantRequestEntityConverter defaultConverter;
     private final String path;
     private final String keyId;
@@ -57,9 +55,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 
         if (registrationId.contains("apple")) {
             try {
-                String clientSecret = createClientSecret();
-                System.out.println("createClientSecret() = " + clientSecret);
-                params.set("client_secret", clientSecret);
+                params.set("client_secret", createClientSecret());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -69,11 +65,6 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
     }
     public PrivateKey getPrivateKey() throws IOException {
 
-        System.out.println("===================================================");
-        System.out.println("====================================================");
-        System.out.println("path = " + path);
-        System.out.println("===================================================");
-        System.out.println("====================================================");
         ClassPathResource resource = new ClassPathResource(path);
 
         InputStream in = resource.getInputStream();
