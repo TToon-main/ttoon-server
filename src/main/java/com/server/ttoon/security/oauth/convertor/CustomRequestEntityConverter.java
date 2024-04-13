@@ -1,9 +1,6 @@
 package com.server.ttoon.security.oauth.convertor;
 
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.databind.util.Converter;
 
 import io.jsonwebtoken.Jwts;
 import lombok.Getter;
@@ -12,6 +9,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -33,7 +31,7 @@ import java.util.Map;
 
 @Getter
 @Component
-public class CustomRequestEntityConverter implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>>, org.springframework.core.convert.converter.Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
+public class CustomRequestEntityConverter implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
     private final OAuth2AuthorizationCodeGrantRequestEntityConverter defaultConverter;
     private final String path;
     private final String keyId;
@@ -98,14 +96,5 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
                 .setSubject(clientId)
                 .signWith(getPrivateKey())
                 .compact();
-    }
-
-    @Override
-    public JavaType getInputType(TypeFactory typeFactory) {
-        return typeFactory.constructType(OAuth2AuthorizationCodeGrantRequest.class);
-    }
-    @Override
-    public JavaType getOutputType(TypeFactory typeFactory) {
-        return typeFactory.constructType(RequestEntity.class);
     }
 }
