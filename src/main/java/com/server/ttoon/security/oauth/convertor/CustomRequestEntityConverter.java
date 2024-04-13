@@ -57,12 +57,13 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 
         if (registrationId.contains("apple")) {
             try {
-                params.set("client_secret", createClientSecret());
+                String clientSecret = createClientSecret();
+                System.out.println("createClientSecret() = " + clientSecret);
+                params.set("client_secret", clientSecret);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println("=============================12121212");
         return new RequestEntity<>(params, entity.getHeaders(),
                 entity.getMethod(), entity.getUrl());
     }
@@ -78,8 +79,6 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
         InputStream in = resource.getInputStream();
         PEMParser pemParser = new PEMParser(new StringReader(IOUtils.toString(in, StandardCharsets.UTF_8)));
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        byte[] privateKeyBytes = object.getEncoded();
-        System.out.println("Private Key Encoded: " + Arrays.toString(privateKeyBytes));
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         return converter.getPrivateKey(object);
     }
