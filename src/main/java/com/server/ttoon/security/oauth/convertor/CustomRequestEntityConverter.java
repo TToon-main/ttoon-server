@@ -1,7 +1,5 @@
 package com.server.ttoon.security.oauth.convertor;
 
-
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Getter;
@@ -9,7 +7,6 @@ import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.RequestEntity;
@@ -18,14 +15,12 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,9 +51,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 
         if (registrationId.contains("apple")) {
             try {
-                String clientSecret = createClientSecret();
-                System.out.println("createClientSecret() = " + clientSecret);
-                params.set("client_secret", clientSecret);
+                params.set("client_secret", createClientSecret());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -68,11 +61,6 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
     }
     public PrivateKey getPrivateKey() throws IOException {
 
-        System.out.println("===================================================");
-        System.out.println("====================================================");
-        System.out.println("path = " + path);
-        System.out.println("===================================================");
-        System.out.println("====================================================");
         ClassPathResource resource = new ClassPathResource(path);
 
         InputStream in = resource.getInputStream();
@@ -83,7 +71,6 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
     }
 
     public String createClientSecret() throws IOException {
-        //Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         Map<String, Object> jwtHeader = new HashMap<>();
         jwtHeader.put("kid", keyId);
         jwtHeader.put("alg", "ES256");
