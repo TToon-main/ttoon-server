@@ -1,7 +1,10 @@
 package com.server.ttoon.security.jwt;
 
+import com.server.ttoon.common.exception.CustomRuntimeException;
+import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.domain.member.entity.Authority;
 import com.server.ttoon.domain.member.entity.Member;
+import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.dto.response.TokenDto;
 import io.jsonwebtoken.*;
@@ -22,21 +25,25 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERREOR;
 import static com.server.ttoon.domain.member.entity.Authority.*;
 import static com.server.ttoon.domain.member.entity.Authority.ROLE_ADMIN;
 
 @Slf4j
 @Component
 public class TokenProvider {
+    private final MemberRepository memberRepository;
 
     private static final String AUTHORITIES_KEY = "auth";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
     private final Key key;
 
-    public TokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public TokenProvider(@Value("${jwt.secret}") String secretKey,
+                         MemberRepository memberRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.memberRepository = memberRepository;
     }
 
     public TokenDto generateTokenDto(Authentication authentication) {
@@ -82,19 +89,10 @@ public class TokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        Authority authority;
-        if(authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN")))
-            authority = ROLE_ADMIN;
-        else if(authorities.contains(new SimpleGrantedAuthority("ROLE_USER")))
-            authority = ROLE_USER;
-        else
-            authority = ROLE_GUEST;
-
         // UserDetails 객체를 만들어서 Authentication 리턴
-        Member member = Member.builder()
-                .id(Long.parseLong(claims.getSubject()))
-                .authority(authority)
-                .build();
+        Member member = memberRepository.findById(Long.parseLong(claims.getSubject())).orElse(null);
+        if(member == null)
+            throw new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR);
         UserDetails principal = new PrincipalDetails(member);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
