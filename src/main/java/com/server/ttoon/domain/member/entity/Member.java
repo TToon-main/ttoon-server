@@ -32,6 +32,7 @@ public class Member extends BaseEntity {
         this.provider = member.getProvider();
         this.providerId = member.getProviderId();
         this.nickName = member.getNickName();
+        this.email = member.getEmail();
     }
 
     public void updateNickName(String nickName){
