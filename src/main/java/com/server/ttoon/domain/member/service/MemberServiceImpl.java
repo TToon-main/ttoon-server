@@ -31,15 +31,16 @@ public class MemberServiceImpl implements MemberService{
         return null;
     }
 
-    public ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AppleIdentityTokenDto> appleIdentityTokenDto){
+    public ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AppleIdentityTokenDto> appleIdentityTokenDto, String sender){
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
-        if(member.getProvider().equals(Provider.APPLE.toString()))
+        if(member.getProvider().equals(Provider.APPLE.toString()) && sender.equals("app"))
         {
             if(!appleIdentityTokenDto.isPresent())
                 throw new CustomRuntimeException(BADREQUEST_ERROR);
 
             String idToken = appleIdentityTokenDto.get().getIdToken();
+
 
 
         }

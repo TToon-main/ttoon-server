@@ -28,9 +28,9 @@ public class MemberController {
 
     @Operation(summary = "계정 정보 조회", description = "로그인한 사용자의 계정정보를 조회합니다.")
     @DeleteMapping("/revoke")
-    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AppleIdentityTokenDto> appleIdentityTokenDto) {
+    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AppleIdentityTokenDto> appleIdentityTokenDto, @RequestHeader("sender") String sender) {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return memberService.revoke(memberId, appleIdentityTokenDto);
+        return memberService.revoke(memberId, appleIdentityTokenDto, sender);
     }
 }

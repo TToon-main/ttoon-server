@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface MemberService {
     ResponseEntity<ApiResponse<?>> getAccountInfo();
-    ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AppleIdentityTokenDto> appleIdentityTokenDto);
+    ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AppleIdentityTokenDto> appleIdentityTokenDto, String sender);
 }
