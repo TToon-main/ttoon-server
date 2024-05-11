@@ -6,4 +6,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface MemberService {
     ResponseEntity<ApiResponse<?>> getAccountInfo();
+    ResponseEntity<ApiResponse<?>> revoke(Long memberId);
 }
