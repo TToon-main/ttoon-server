@@ -48,6 +48,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         }
         String provider = oAuth2UserInfo.getProvider().toUpperCase();
         String providerId = oAuth2UserInfo.getProviderId();
+        String email = oAuth2UserInfo.getEmail();
 
         Member member = memberRepository.findByProviderAndProviderId(Provider.valueOf(provider),providerId);
 
@@ -60,6 +61,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                     .nickName(nickName)
                     .provider(Provider.valueOf(provider))
                     .providerId(providerId)
+                    .email(email)
                     .build();
             memberRepository.save(member);
             return new PrincipalDetails(member,oAuth2UserInfo.getAttributes());
