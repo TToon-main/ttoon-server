@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERREOR;
 
-@Tag(name = "앱 로그인 API", description = "로그인 및 회원가입 기능")
+@Tag(name = "Auth API", description = "로그인 및 회원가입 기능")
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
