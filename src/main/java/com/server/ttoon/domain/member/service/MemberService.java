@@ -2,10 +2,10 @@ package com.server.ttoon.domain.member.service;
 
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
-import com.server.ttoon.domain.member.entity.Member;
-import com.server.ttoon.security.jwt.dto.request.AppleIdentityTokenDto;
+import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public interface MemberService {
@@ -14,6 +14,6 @@ public interface MemberService {
 
     ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newUrl, String fileName);
 
-    ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AppleIdentityTokenDto> appleIdentityTokenDto, String sender);
+    ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AuthorizationCodeDto> appleIdentityTokenDto, String sender) throws IOException;
 
 }
