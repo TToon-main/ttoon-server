@@ -22,6 +22,9 @@ public class Member extends BaseEntity {
     private Provider provider;
     private String providerId;
     private String nickName;
+    private String imageFileName;
+    private String imageUrl;
+    private int point;
     private String email;
 
     public void changeToUser(Member member){
@@ -30,5 +33,17 @@ public class Member extends BaseEntity {
         this.providerId = member.getProviderId();
         this.nickName = member.getNickName();
         this.email = member.getEmail();
+    }
+
+    public void updateNickName(String nickName){
+        this.nickName = nickName;
+    }
+
+    public void updateImage(String imageUrl){
+        this.imageUrl = imageUrl;
+    }
+
+    public void updateFileName(String fileName){
+        this.imageFileName = fileName;
     }
 }
