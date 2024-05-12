@@ -4,15 +4,13 @@ import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.service.MemberService;
-import com.server.ttoon.security.jwt.dto.request.AppleIdentityTokenDto;
+import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
 import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,7 +61,7 @@ public class MemberController {
 
     @Operation(summary = "서비스 탈퇴", description = "로그인한 사용자의 앱/웹 서비스를 탈퇴합니다.")
     @DeleteMapping("/revoke")
-    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AppleIdentityTokenDto> appleIdentityTokenDto, @RequestHeader("sender") String sender) {
+    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AuthorizationCodeDto> appleIdentityTokenDto, @RequestHeader("sender") String sender) throws IOException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
         return memberService.revoke(memberId, appleIdentityTokenDto, sender);
