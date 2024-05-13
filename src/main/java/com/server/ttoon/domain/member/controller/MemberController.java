@@ -28,7 +28,7 @@ public class MemberController {
     private final S3Service s3Service;
 
     @Operation(summary = "프로필 + 계정 정보 조회", description = "사용자의 계정정보, 프로필 모두 조회합니다.")
-    @GetMapping("/account")
+    @GetMapping("/profile")
     public ResponseEntity<ApiResponse<?>> getAccountInfo(){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
