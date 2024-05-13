@@ -6,4 +6,5 @@ import lombok.Data;
 public class OAuth2LoginReqDto {
     private String providerId;
     private String provider;
+    private String email;
 }

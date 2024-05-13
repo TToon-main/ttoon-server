@@ -81,6 +81,7 @@ public class AppAuthServiceImpl implements AppAuthService{
         // provider 와 providerId 를 이용해 유저 찾기.
         String provider = oAuth2LoginReqDto.getProvider();
         String providerId = oAuth2LoginReqDto.getProviderId();
+        String email = oAuth2LoginReqDto.getEmail();
         Member member = memberRepository.findByProviderAndProviderId(Provider.valueOf(provider), providerId);
 
         // 회원이 아니면 권한 ROLE_GUEST 부여해서 디비 저장하고 반환.
@@ -90,6 +91,7 @@ public class AppAuthServiceImpl implements AppAuthService{
                     .provider(Provider.valueOf(oAuth2LoginReqDto.getProvider()))
                     .providerId(oAuth2LoginReqDto.getProviderId())
                     .nickName(provider + "_" + providerId)
+                     .email(email)
                     .authority(Authority.ROLE_GUEST)
                     .build();
 
