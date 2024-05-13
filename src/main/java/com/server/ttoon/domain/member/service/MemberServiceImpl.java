@@ -1,5 +1,6 @@
 package com.server.ttoon.domain.member.service;
 
+import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.ErrorStatus;
@@ -52,6 +53,7 @@ import static com.server.ttoon.common.response.status.SuccessStatus.*;
 public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final S3Service s3Service;
     private final AppleProperties appleProperties;
 
     // 프로필 + 계정 정보 조회 메소드
@@ -60,11 +62,15 @@ public class MemberServiceImpl implements MemberService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR));
 
+        // 이미지의 presignedUrl 받아오기
+        String image = member.getImage();
+        String url = s3Service.getPresignedURL(image);
+
+
         AccountResponseDto accountResponseDto = AccountResponseDto.builder()
                 .nickName(member.getNickName())
                 .email(member.getEmail())
-                .imageUrl(member.getImageUrl())
-                .fileName(member.getImageFileName())
+                .imageUrl(url)
                 .provider(member.getProvider())
                 .point(member.getPoint())
                 .build();
@@ -73,21 +79,22 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newUrl, String fileName) {
+    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newImage) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR));
 
+        s3Service.deleteImage(member.getImage());
+
         member.updateNickName(modifyRequestDto.getNickName());
 
-        member.updateImage(newUrl);
-
-        member.updateFileName(fileName);
+        member.updateImage(newImage);
 
         memberRepository.save(member);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
     }
+
     @Transactional
     public ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AuthorizationCodeDto> appleIdentityTokenDto, String sender) throws IOException {
 

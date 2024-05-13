@@ -2,6 +2,7 @@ package com.server.ttoon.domain.member.controller;
 
 import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.response.ApiResponse;
+import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.service.MemberService;
 import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
@@ -9,6 +10,7 @@ import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,21 +44,12 @@ public class MemberController {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        String fileName = null;
-        String newUrl = null;
+        String newImage = null;
         if (file != null) {
-            // s3 에서 해당 파일 삭제하려면 fileName 자체가 필요함.
-            // imageUrl에는 aws 에서 임의로 코드같은걸 붙이기 때문에 그게 없는 순수한 fileName 필요
-            fileName = file.getOriginalFilename();
-            newUrl = s3Service.saveFile(file, "images");
+            newImage = s3Service.saveFile(file, "images");
         }
 
-        String oldUrl = modifyRequestDto.getOldImageName();
-        if (oldUrl != null) {
-            s3Service.deleteImage(oldUrl, "images");
-        }
-
-        return memberService.modifyProfile(memberId, modifyRequestDto, newUrl, fileName);
+        return memberService.modifyProfile(memberId, modifyRequestDto, newImage);
     }
 
     @Operation(summary = "서비스 탈퇴", description = "로그인한 사용자의 앱/웹 서비스를 탈퇴합니다.")
