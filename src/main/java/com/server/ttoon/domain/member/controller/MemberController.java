@@ -61,7 +61,7 @@ public class MemberController {
 
     @Operation(summary = "서비스 탈퇴", description = "로그인한 사용자의 앱/웹 서비스를 탈퇴합니다.")
     @DeleteMapping("/revoke")
-    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AuthorizationCodeDto> appleIdentityTokenDto, @RequestHeader("sender") String sender) throws IOException {
+    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AuthorizationCodeDto> appleIdentityTokenDto, @RequestHeader("Sender") String sender) throws IOException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
         return memberService.revoke(memberId, appleIdentityTokenDto, sender);
