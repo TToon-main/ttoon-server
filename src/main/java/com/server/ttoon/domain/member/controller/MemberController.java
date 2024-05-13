@@ -30,7 +30,7 @@ public class MemberController {
     private final S3Service s3Service;
 
     @Operation(summary = "프로필 + 계정 정보 조회", description = "사용자의 계정정보, 프로필 모두 조회합니다.")
-    @GetMapping("/account")
+    @GetMapping("/profile")
     public ResponseEntity<ApiResponse<?>> getAccountInfo(){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
@@ -54,7 +54,7 @@ public class MemberController {
 
     @Operation(summary = "서비스 탈퇴", description = "로그인한 사용자의 앱/웹 서비스를 탈퇴합니다.")
     @DeleteMapping("/revoke")
-    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AuthorizationCodeDto> appleIdentityTokenDto, @RequestHeader("sender") String sender) throws IOException {
+    public ResponseEntity<ApiResponse<?>> revoke(@RequestBody Optional<AuthorizationCodeDto> appleIdentityTokenDto, @RequestHeader("Sender") String sender) throws IOException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
         return memberService.revoke(memberId, appleIdentityTokenDto, sender);

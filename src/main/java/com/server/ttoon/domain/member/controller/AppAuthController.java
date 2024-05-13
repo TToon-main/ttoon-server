@@ -43,7 +43,7 @@ public class AppAuthController {
     }
 
     @Operation(summary = "서버 버전 불러오기", description = "서버의 최소 버전 불러오기")
-    @GetMapping("/version")
+    @GetMapping("/auth/version")
     public ResponseEntity<ApiResponse<?>> currentVersion(){
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, "1.0.0"));
