@@ -12,7 +12,7 @@ public interface MemberService {
 
     ResponseEntity<ApiResponse<?>> getAccountInfo(Long memberId);
 
-    ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newUrl, String fileName);
+    ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newImage);
 
     ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AuthorizationCodeDto> appleIdentityTokenDto, String sender) throws IOException;
 

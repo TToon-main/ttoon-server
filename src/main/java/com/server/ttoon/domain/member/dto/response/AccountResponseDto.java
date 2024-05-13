@@ -10,7 +10,6 @@ public class AccountResponseDto {
 
     private String nickName;
     private String imageUrl;
-    private String fileName;
     private int point;
     private String email;
     private Provider provider;
