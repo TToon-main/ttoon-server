@@ -24,7 +24,6 @@ public class Member extends BaseEntity {
     private String nickName;
     private String imageFileName;
     private String imageUrl;
-    private int point;
     private String email;
 
     public void changeToUser(Member member){
