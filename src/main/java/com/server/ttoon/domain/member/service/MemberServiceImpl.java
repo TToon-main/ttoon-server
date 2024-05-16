@@ -72,7 +72,6 @@ public class MemberServiceImpl implements MemberService{
                 .email(member.getEmail())
                 .imageUrl(url)
                 .provider(member.getProvider())
-                .point(member.getPoint())
                 .build();
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, accountResponseDto));
