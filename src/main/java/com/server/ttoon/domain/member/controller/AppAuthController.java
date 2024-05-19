@@ -53,7 +53,7 @@ public class AppAuthController {
     }
 
     @Operation(summary = "문의하기", description = "앱 문의사항 문의하기")
-    @GetMapping("/ask")
+    @PostMapping("/ask")
     public ResponseEntity<ApiResponse<?>> sendEmail(@RequestBody AskRequestDto askRequestDto){
 
         return mailService.sendEmail(askRequestDto);
