@@ -3,8 +3,10 @@ package com.server.ttoon.domain.member.controller;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.SuccessStatus;
+import com.server.ttoon.domain.member.dto.request.AskRequestDto;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.repository.MemberRepository;
+import com.server.ttoon.domain.member.service.MailService;
 import com.server.ttoon.security.jwt.dto.request.OAuth2LoginReqDto;
 import com.server.ttoon.domain.member.service.AppAuthService;
 import com.server.ttoon.security.util.SecurityUtil;
@@ -24,6 +26,7 @@ public class AppAuthController {
 
     private final AppAuthService appAuthService;
     private final MemberRepository memberRepository;
+    private final MailService mailService;
 
     @Operation(summary = "로그인", description = "RequestBody 로 provider, providerId 받아서 검증 후 로그인합니다.")
     @PostMapping("/auth/app/login")
@@ -48,4 +51,12 @@ public class AppAuthController {
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, "1.0.0"));
     }
+
+    @Operation(summary = "문의하기", description = "앱 문의사항 문의하기")
+    @PostMapping("/ask")
+    public ResponseEntity<ApiResponse<?>> sendEmail(@RequestBody AskRequestDto askRequestDto){
+
+        return mailService.sendEmail(askRequestDto);
+    }
+
 }
