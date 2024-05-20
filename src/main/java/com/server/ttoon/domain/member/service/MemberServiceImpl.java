@@ -9,7 +9,9 @@ import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.dto.response.AccountResponseDto;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.entity.Provider;
+import com.server.ttoon.domain.member.entity.RevokeReason;
 import com.server.ttoon.domain.member.repository.MemberRepository;
+import com.server.ttoon.domain.member.repository.RevokeReasonRepository;
 import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
 import com.server.ttoon.security.jwt.dto.response.AppleAuthTokenResponse;
 import com.server.ttoon.security.jwt.entity.RefreshToken;
@@ -53,6 +55,7 @@ import static com.server.ttoon.common.response.status.SuccessStatus.*;
 public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RevokeReasonRepository revokeReasonRepository;
     private final S3Service s3Service;
     private final AppleProperties appleProperties;
 
@@ -99,9 +102,20 @@ public class MemberServiceImpl implements MemberService{
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(memberId.toString()).orElse(null);
+
+        if(appleIdentityTokenDto.isEmpty())
+            throw new CustomRuntimeException(BADREQUEST_ERROR);
+
+        RevokeReason revokeReason = RevokeReason.builder()
+                .userName(member.getNickName())
+                .reason(appleIdentityTokenDto.get().getRevokeReason())
+                .build();
+
+        revokeReasonRepository.save(revokeReason);
+
         if(member.getProvider().equals(Provider.APPLE.toString()) && sender.equals("app"))
         {
-            if(!appleIdentityTokenDto.isPresent())
+            if(appleIdentityTokenDto.get().getAuthorizationCode().isEmpty())
                 throw new CustomRuntimeException(BADREQUEST_ERROR);
 
             String code = appleIdentityTokenDto.get().getAuthorizationCode();
