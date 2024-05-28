@@ -119,20 +119,32 @@ public class SecurityConfig {
                     .isGuest(isGuest)
                     .build();
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            ApiResponse<OAuth2LoginResDto> apiResponse = ApiResponse.onSuccess(SuccessStatus._OK, oAuth2LoginResDto);
-            // JSON 직렬화
-            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
 
-            // 응답 설정
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
-            // 응답 전송
-            PrintWriter out = response.getWriter();
-            out.println(jsonResponse);
-            out.flush();
+
+            // 쿼리 파라미터 생성
+            String redirectUrl = String.format("http://localhost:3000?accessToken=%s&refreshToken=%s&isGuest=%s",
+                    oAuth2LoginResDto.getAccessToken(),
+                    oAuth2LoginResDto.getRefreshToken(),
+                    oAuth2LoginResDto.isGuest());
+
+            // 리다이렉트 설정
+            response.sendRedirect(redirectUrl);
+
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            ApiResponse<OAuth2LoginResDto> apiResponse = ApiResponse.onSuccess(SuccessStatus._OK, oAuth2LoginResDto);
+//            // JSON 직렬화
+//            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
+//
+//            // 응답 설정
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+//
+//            // 응답 전송
+//            PrintWriter out = response.getWriter();
+//            out.println(jsonResponse);
+//            out.flush();
         };
     }
     @Bean
