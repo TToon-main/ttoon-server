@@ -75,7 +75,7 @@ public class SecurityConfig {
                 .httpBasic((auth)->auth.disable())
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/api/auth/**", "/login/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/login/**", "/oauth2/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2Login -> oauth2Login
                         .tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient(customRequestEntityConverter())))
