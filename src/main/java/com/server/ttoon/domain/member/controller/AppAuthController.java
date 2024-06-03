@@ -11,6 +11,7 @@ import com.server.ttoon.security.jwt.dto.request.OAuth2LoginReqDto;
 import com.server.ttoon.domain.member.service.AppAuthService;
 import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AppAuthController {
     private final MemberRepository memberRepository;
     private final MailService mailService;
 
-    @Operation(summary = "로그인", description = "RequestBody 로 provider, providerId 받아서 검증 후 로그인합니다.")
+    @Operation(summary = "로그인", description = "RequestBody 로 provider, providerId, 이메일을 받아서 검증 후 로그인합니다.", security = @SecurityRequirement(name = ""))
     @PostMapping("/auth/app/login")
     public ResponseEntity<ApiResponse<?>> appLogin(@RequestBody OAuth2LoginReqDto oAuth2LoginReqDto){
 
@@ -45,7 +46,7 @@ public class AppAuthController {
         return appAuthService.join(member);
     }
 
-    @Operation(summary = "서버 버전 불러오기", description = "서버의 최소 버전 불러오기")
+    @Operation(summary = "서버 버전 불러오기", description = "서버의 최소 버전 불러오기", security = @SecurityRequirement(name = ""))
     @GetMapping("/auth/version")
     public ResponseEntity<ApiResponse<?>> currentVersion(){
 
