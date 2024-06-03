@@ -3,6 +3,8 @@ package com.server.ttoon.security.jwt.controller;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.security.jwt.service.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class JwtController {
     private final JwtService jwtService;
 
-    @Operation(summary = "토큰 재발급 API", description = "리프레쉬 토큰을 검증한 후 액세스 토큰을 재발급합니다.", security = @SecurityRequirement(name = ""))
+    @Operation(
+            summary = "토큰 재발급 API",
+            description = "리프레쉬 토큰을 검증한 후 액세스 토큰을 재발급합니다.",
+            security = @SecurityRequirement(name = ""),
+            parameters = {
+                    @Parameter(name = "Authorization", in = ParameterIn.HEADER, required = true, description = "Access Token"),
+                    @Parameter(name = "refreshToken", in = ParameterIn.HEADER, required = true, description = "Refresh Token")
+            }
+    )
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<?>> reissue(@RequestHeader(value = "Authorization") String accessToken, @RequestHeader(value = "refreshToken") String refreshToken){
         //Bearer 접두사 삭제
