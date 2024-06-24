@@ -1,0 +1,48 @@
+package com.server.ttoon.domain.feed.controller;
+
+import com.server.ttoon.common.response.ApiResponse;
+import com.server.ttoon.domain.feed.dto.AddCharacterDto;
+import com.server.ttoon.domain.feed.dto.CharacterDto;
+import com.server.ttoon.domain.feed.service.FeedService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "Feed API", description = "피드 관련 기능")
+@RestController
+@RequestMapping("api")
+@RequiredArgsConstructor
+public class FeedController {
+
+    private final FeedService feedService;
+
+    @Operation(summary = "등장인물 추가", description = "사용자의 기록 속 새로운 등장인물을 추가합니다.")
+    @PostMapping("/character")
+    public ResponseEntity<ApiResponse<?>> addFeedCharacter(@RequestBody AddCharacterDto addCharacterDto){
+
+        return feedService.addFeedCharacter(addCharacterDto);
+    }
+
+    @Operation(summary = "등장인물 수정", description = "사용자의 기록 속 등장인물 정보를 수정합니다.")
+    @PatchMapping("/character")
+    public ResponseEntity<ApiResponse<?>> changeFeedCharacter(@RequestBody CharacterDto characterDto){
+
+        return feedService.changeFeedCharacter(characterDto);
+    }
+
+    @Operation(summary = "등장인물 조회", description = "사용자의 기록 속 등장인물 정보들을 조회합니다.")
+    @GetMapping("/character")
+    public ResponseEntity<ApiResponse<?>> getFeedCharacters(){
+
+        return feedService.getFeedCharacter();
+    }
+
+    @Operation(summary = "등장인물 삭제", description = "사용자의 기록 속 등장인물을 삭제합니다.")
+    @DeleteMapping("/character/{characterId}")
+    public ResponseEntity<ApiResponse<?>> deleteFeedCharacter(@PathVariable Long characterId){
+
+        return feedService.deleteFeedCharacter(characterId);
+    }
+}

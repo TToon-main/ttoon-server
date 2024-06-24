@@ -19,6 +19,7 @@ public class Feed extends BaseEntity {
     private String title;
 
     private String content;
+    private int number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
