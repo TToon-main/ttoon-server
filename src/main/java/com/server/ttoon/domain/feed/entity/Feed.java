@@ -5,6 +5,9 @@ import com.server.ttoon.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -19,8 +22,12 @@ public class Feed extends BaseEntity {
     private String title;
 
     private String content;
+    private int number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @OneToMany(mappedBy = "feed", cascade = CascadeType.ALL)
+    private List<FeedImage> feedImageList = new ArrayList<>();
 
 }

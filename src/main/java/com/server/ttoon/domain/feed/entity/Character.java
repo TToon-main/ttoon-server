@@ -1,5 +1,6 @@
 package com.server.ttoon.domain.feed.entity;
 
+import com.server.ttoon.domain.feed.dto.CharacterDto;
 import com.server.ttoon.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Characters {
+public class Character {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +25,18 @@ public class Characters {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public void updateCharacter(String name, String info){
+        this.name = name;
+        this.info = info;
+    }
+
+    public CharacterDto toCharacterDto() {
+
+        return CharacterDto.builder()
+                .id(id)
+                .name(name)
+                .info(info)
+                .build();
+    }
 }
