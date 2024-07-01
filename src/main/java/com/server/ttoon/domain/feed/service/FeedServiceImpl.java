@@ -157,4 +157,23 @@ public class FeedServiceImpl implements FeedService{
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<?>> getOneFeed(Long feedId) {
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
+
+        List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
+
+        FeedDto feedDto = FeedDto.builder()
+                .title(feed.getTitle())
+                .content(feed.getContent())
+                .imageUrl(feedImageList.stream()
+                        .map(FeedImage::getImageUrl).collect(Collectors.toList())
+                )
+                .createdDate(feed.getCreatedAt())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDto));
+    }
 }

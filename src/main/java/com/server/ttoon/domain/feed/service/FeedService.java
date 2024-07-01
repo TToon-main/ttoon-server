@@ -15,4 +15,5 @@ public interface FeedService {
     ResponseEntity<ApiResponse<?>> getFeedCharacter();
     ResponseEntity<ApiResponse<?>> deleteFeedCharacter(Long characterId);
     ResponseEntity<ApiResponse<?>> getFeeds(int page, int size);
+    ResponseEntity<ApiResponse<?>> getOneFeed(Long feedId);
 }
