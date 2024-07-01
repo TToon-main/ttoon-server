@@ -21,13 +21,20 @@ public class FeedController {
 
     private final FeedService feedService;
 
-    @Operation(summary = "등장인물 조회", description = "사용자의 기록 속 등장인물 정보들을 조회합니다.")
+    @Operation(summary = "피드 화면 조회", description = "피드 화면상의 데이터를 전달합니다.")
     @GetMapping("/feeds")
     public ResponseEntity<ApiResponse<?>> getFeeds(@RequestParam(name = "page", required = true) int page,
                                                    @RequestParam(name = "size", required = true) int size
                                                    ){
 
         return feedService.getFeeds(page, size);
+    }
+
+    @Operation(summary = "단일 피드 조회", description = "피드 하나의 데이터를 조회합니다.")
+    @GetMapping("/feeds/{feedId}")
+    public ResponseEntity<ApiResponse<?>> getOneFeed(@PathVariable("feedId") Long feedId) {
+
+        return feedService.getOneFeed(feedId);
     }
 
     @Operation(summary = "등장인물 추가", description = "사용자의 기록 속 새로운 등장인물을 추가합니다.")
