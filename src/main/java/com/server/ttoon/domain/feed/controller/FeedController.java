@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Tag(name = "Feed API", description = "피드 관련 기능")
 @RestController
 @RequestMapping("api")
@@ -17,6 +20,15 @@ import org.springframework.web.bind.annotation.*;
 public class FeedController {
 
     private final FeedService feedService;
+
+    @Operation(summary = "등장인물 조회", description = "사용자의 기록 속 등장인물 정보들을 조회합니다.")
+    @GetMapping("/feeds")
+    public ResponseEntity<ApiResponse<?>> getFeeds(@RequestParam(name = "page", required = true) int page,
+                                                   @RequestParam(name = "size", required = true) int size
+                                                   ){
+
+        return feedService.getFeeds(page, size);
+    }
 
     @Operation(summary = "등장인물 추가", description = "사용자의 기록 속 새로운 등장인물을 추가합니다.")
     @PostMapping("/character")
