@@ -6,29 +6,24 @@ import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.feed.dto.AddCharacterDto;
 import com.server.ttoon.domain.feed.dto.CharacterDto;
 import com.server.ttoon.domain.feed.dto.FeedDto;
-import com.server.ttoon.domain.feed.entity.Character;
+import com.server.ttoon.domain.feed.entity.Figure;
 import com.server.ttoon.domain.feed.entity.Feed;
 import com.server.ttoon.domain.feed.entity.FeedImage;
-import com.server.ttoon.domain.feed.repository.CharacterRepository;
+import com.server.ttoon.domain.feed.repository.FigureRepository;
 import com.server.ttoon.domain.feed.repository.FeedImageRepository;
 import com.server.ttoon.domain.feed.repository.FeedRepository;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.util.SecurityUtil;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ObjectUtils;
-import org.hibernate.query.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +38,7 @@ import static com.server.ttoon.common.response.status.ErrorStatus.*;
 public class FeedServiceImpl implements FeedService{
 
     private final MemberRepository memberRepository;
-    private final CharacterRepository characterRepository;
+    private final FigureRepository figureRepository;
     private final FeedRepository feedRepository;
     private final FeedImageRepository feedImageRepository;
 
@@ -55,13 +50,13 @@ public class FeedServiceImpl implements FeedService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
 
-        Character character = Character.builder()
+        Figure figure = Figure.builder()
                 .name(addCharacterDto.getName())
                 .info(addCharacterDto.getInfo())
                 .member(member)
                 .build();
 
-        characterRepository.save(character);
+        figureRepository.save(figure);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.onSuccess(SuccessStatus._CREATED));
@@ -71,10 +66,10 @@ public class FeedServiceImpl implements FeedService{
     @Transactional
     public ResponseEntity<ApiResponse<?>> changeFeedCharacter(CharacterDto characterDto) {
 
-        Character character = characterRepository.findById(characterDto.getId())
+        Figure figure = figureRepository.findById(characterDto.getId())
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
 
-        character.updateCharacter(characterDto.getName(), characterDto.getInfo());
+        figure.updateCharacter(characterDto.getName(), characterDto.getInfo());
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
     }
@@ -87,11 +82,11 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
 
 
-        List<Character> characters = characterRepository.findAllByMember(member);
+        List<Figure> figures = figureRepository.findAllByMember(member);
 
         List<CharacterDto> characterDtos = new ArrayList<>();
-        for(Character character:characters){
-            characterDtos.add(character.toCharacterDto());
+        for(Figure figure : figures){
+            characterDtos.add(figure.toCharacterDto());
         }
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, characterDtos));
@@ -101,10 +96,10 @@ public class FeedServiceImpl implements FeedService{
     @Transactional
     public ResponseEntity<ApiResponse<?>> deleteFeedCharacter(Long characterId) {
 
-        Character character = characterRepository.findById(characterId)
+        Figure figure = figureRepository.findById(characterId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
 
-        characterRepository.delete(character);
+        figureRepository.delete(figure);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
     }

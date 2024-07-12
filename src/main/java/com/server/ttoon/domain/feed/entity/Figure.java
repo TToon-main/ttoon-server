@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Character {
+public class Figure {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
