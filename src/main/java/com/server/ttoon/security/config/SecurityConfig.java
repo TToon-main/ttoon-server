@@ -123,7 +123,7 @@ public class SecurityConfig {
 
 
             // 쿼리 파라미터 생성
-            String redirectUrl = String.format("http://ttoon.site?accessToken=%s&refreshToken=%s&isGuest=%s",
+            String redirectUrl = String.format("https://ttoon.site?accessToken=%s&refreshToken=%s&isGuest=%s",
                     oAuth2LoginResDto.getAccessToken(),
                     oAuth2LoginResDto.getRefreshToken(),
                     oAuth2LoginResDto.isGuest());
