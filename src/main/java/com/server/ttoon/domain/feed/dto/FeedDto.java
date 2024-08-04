@@ -17,6 +17,6 @@ public class FeedDto {
     private String content;
     private List<String> imageUrl;
     private LocalDateTime createdDate;
-
+    private int like;
 
 }

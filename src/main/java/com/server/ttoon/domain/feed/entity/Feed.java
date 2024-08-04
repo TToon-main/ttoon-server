@@ -24,10 +24,15 @@ public class Feed extends BaseEntity {
     private String content;
     private int number;
 
+    private int like;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @OneToMany(mappedBy = "feed", cascade = CascadeType.ALL)
     private List<FeedImage> feedImageList = new ArrayList<>();
 
+    public void updateLike(int like) {
+        this.like = like;
+    }
 }

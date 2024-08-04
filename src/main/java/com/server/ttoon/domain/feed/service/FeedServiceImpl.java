@@ -13,12 +13,15 @@ import com.server.ttoon.domain.feed.repository.FigureRepository;
 import com.server.ttoon.domain.feed.repository.FeedImageRepository;
 import com.server.ttoon.domain.feed.repository.FeedRepository;
 import com.server.ttoon.domain.member.entity.Member;
+import com.server.ttoon.domain.member.entity.MemberLikes;
+import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,7 @@ public class FeedServiceImpl implements FeedService{
     private final FigureRepository figureRepository;
     private final FeedRepository feedRepository;
     private final FeedImageRepository feedImageRepository;
+    private final MemberLikesRepository memberLikesRepository;
 
     @Override
     @Transactional
@@ -106,7 +110,7 @@ public class FeedServiceImpl implements FeedService{
 
     // 피드 화면 조회
     @Override
-    public ResponseEntity<ApiResponse<?>> getFeeds(int page, int size) {
+    public ResponseEntity<ApiResponse<?>> getFeeds(int page, int size, Boolean myFilter) {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
@@ -126,6 +130,7 @@ public class FeedServiceImpl implements FeedService{
                         .imageUrl(feed.getFeedImageList().stream()
                                 .map(FeedImage::getImageUrl).collect(Collectors.toList()))
                         .createdDate(feed.getCreatedAt())
+                        .like(feed.getLike())
                         .build()
                 )
                 .toList();
@@ -167,8 +172,70 @@ public class FeedServiceImpl implements FeedService{
                         .map(FeedImage::getImageUrl).collect(Collectors.toList())
                 )
                 .createdDate(feed.getCreatedAt())
+                .like(feed.getLike())
                 .build();
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDto));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> addLike(Long memberId, Long feedId){
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+
+        // 유저가 이미 좋아요한 피드인지 확인.
+        Optional<MemberLikes> optionalMemberLikes = memberLikesRepository.findByMemberAndFeed(member, feed);
+
+        if(optionalMemberLikes.isPresent()){
+            return ResponseEntity.ok(ApiResponse.onFailure(BADREQUEST_LIKE_ERROR));
+        }
+
+        // 피드 좋아요 개수 업데이트.
+        feed.updateLike(feed.getLike()+1);
+
+        feedRepository.save(feed);
+
+        // 유저가 좋아요한 피드 레포지토리에 저장
+        MemberLikes memberLikes = MemberLikes.builder()
+                .member(member)
+                .feed(feed)
+                .build();
+
+        memberLikesRepository.save(memberLikes);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLike()));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> deleteLike(Long memberId, Long feedId) {
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+
+        // 유저가 좋아요했던 피드인지 확인
+        Optional<MemberLikes> optionalMemberLikes = memberLikesRepository.findByMemberAndFeed(member, feed);
+
+        if(optionalMemberLikes.isEmpty()){
+            return ResponseEntity.ok(ApiResponse.onFailure(BADREQUEST_LIKE_ERROR));
+        }
+
+        // 피드 좋아요 개수 업데이트.
+        feed.updateLike(feed.getLike()-1);
+
+        feedRepository.save(feed);
+
+        // 유저가 좋아요 취소한 피드 레포지토리에서 삭제
+        MemberLikes memberLikes = optionalMemberLikes.get();
+
+        memberLikesRepository.delete(memberLikes);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLike()));
     }
 }

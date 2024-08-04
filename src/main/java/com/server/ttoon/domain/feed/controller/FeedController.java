@@ -4,6 +4,7 @@ import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.feed.dto.AddCharacterDto;
 import com.server.ttoon.domain.feed.dto.CharacterDto;
 import com.server.ttoon.domain.feed.service.FeedService;
+import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,11 @@ public class FeedController {
     @Operation(summary = "피드 화면 조회", description = "피드 화면상의 데이터를 전달합니다.")
     @GetMapping("/feeds")
     public ResponseEntity<ApiResponse<?>> getFeeds(@RequestParam(name = "page", required = true) int page,
-                                                   @RequestParam(name = "size", required = true) int size
+                                                   @RequestParam(name = "size", required = true) int size,
+                                                   @RequestParam(name = "myFilter", required = true) Boolean myFilter
                                                    ){
 
-        return feedService.getFeeds(page, size);
+        return feedService.getFeeds(page, size, myFilter);
     }
 
     @Operation(summary = "단일 피드 조회", description = "피드 하나의 데이터를 조회합니다.")
@@ -35,6 +37,23 @@ public class FeedController {
     public ResponseEntity<ApiResponse<?>> getOneFeed(@PathVariable("feedId") Long feedId) {
 
         return feedService.getOneFeed(feedId);
+    }
+
+    @Operation(summary = "좋아요 추가", description = "피드 좋아요를 추가합니다.")
+    @PostMapping("/feeds/{feedId}")
+    public ResponseEntity<ApiResponse<?>> addLike(@PathVariable("feedId") Long feedId){
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        return feedService.addLike(memberId, feedId);
+    }
+    @Operation(summary = "좋아요 취소", description = "피드 좋아요를 취소합니다.")
+    @DeleteMapping("/feeds/{feedId}")
+    public ResponseEntity<ApiResponse<?>> deleteLike(@PathVariable("feedId") Long feedId){
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        return feedService.addLike(memberId, feedId);
     }
 
     @Operation(summary = "등장인물 추가", description = "사용자의 기록 속 새로운 등장인물을 추가합니다.")
