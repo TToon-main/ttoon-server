@@ -1,27 +1,26 @@
 package com.server.ttoon.domain.member.entity;
 
 import com.server.ttoon.common.BaseEntity;
-import com.server.ttoon.domain.feed.entity.Feed;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberLikes extends BaseEntity {
+public class InviteFriend extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Feed feed;
+    private Friend friend;
 }
