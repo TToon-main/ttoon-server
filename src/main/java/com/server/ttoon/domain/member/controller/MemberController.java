@@ -60,10 +60,16 @@ public class MemberController {
         return memberService.revoke(memberId, appleIdentityTokenDto, sender);
     }
 
-    @Operation(summary = "친구 추가", description = "닉네임으로 친구추가를 합니다.")
+    @Operation(summary = "친구 초대", description = "닉네임으로 친구추가를 합니다.")
     @PostMapping("/friends")
     public ResponseEntity<ApiResponse<?>> addFriend(@RequestBody String nickName){
         Long memberId = SecurityUtil.getCurrentMemberId();
         return memberService.addFriend(memberId, nickName);
+    }
+
+    @Operation(summary = "친구 초대 수락", description = "친구 초대를 수락합니다.")
+    @PostMapping("/friends/{friendId}")
+    public ResponseEntity<ApiResponse<?>> acceptInvite(@PathVariable("friendId") Long friendId){
+        return memberService.acceptInvite(friendId);
     }
 }

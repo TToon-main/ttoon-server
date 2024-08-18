@@ -143,7 +143,14 @@ public class MemberServiceImpl implements MemberService{
         friendRepository.save(friend);
         return ResponseEntity.ok(onSuccess(_OK));
     }
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> acceptInvite(Long friendId){
+        Friend friend = friendRepository.findById(friendId).get();
+        friend.changeStatus(Status.ACCEPT);
+        friendRepository.save(friend);
 
+        return ResponseEntity.ok(onSuccess(_OK));
+    }
 
     private void appleServiceRevoke(AppleAuthTokenResponse appleAuthToken) throws IOException {
         if (appleAuthToken.getAccessToken() != null) {

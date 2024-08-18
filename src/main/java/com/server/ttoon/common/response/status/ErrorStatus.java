@@ -17,6 +17,7 @@ public enum ErrorStatus {
     FRIEND_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_5", "이미 친구이거나 둘 중 한명이 초대 요청을 보냈습니다.");
 
 
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
