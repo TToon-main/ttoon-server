@@ -17,4 +17,7 @@ public interface MemberService {
     ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AuthorizationCodeDto> appleIdentityTokenDto, String sender) throws IOException;
     ResponseEntity<ApiResponse<?>> addFriend(Long memberId, String nickName);
     ResponseEntity<ApiResponse<?>> acceptInvite(Long friendId);
+    ResponseEntity<ApiResponse<?>> deleteFriend(Long friendId);
+    ResponseEntity<ApiResponse<?>> getFriends(Long memberId);
+
 }
