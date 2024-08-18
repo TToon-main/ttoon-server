@@ -1,10 +1,7 @@
 package com.server.ttoon.domain.member.entity;
 
 import com.server.ttoon.common.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -18,8 +15,12 @@ public class Friend extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nickName;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    private String profileUrl;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member invitor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member invitee;
 }
