@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -130,7 +129,7 @@ public class FeedServiceImpl implements FeedService{
                         .imageUrl(feed.getFeedImageList().stream()
                                 .map(FeedImage::getImageUrl).collect(Collectors.toList()))
                         .createdDate(feed.getCreatedAt())
-                        .like(feed.getLike())
+                        .likes(feed.getLikes())
                         .build()
                 )
                 .toList();
@@ -172,7 +171,7 @@ public class FeedServiceImpl implements FeedService{
                         .map(FeedImage::getImageUrl).collect(Collectors.toList())
                 )
                 .createdDate(feed.getCreatedAt())
-                .like(feed.getLike())
+                .likes(feed.getLikes())
                 .build();
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDto));
@@ -195,7 +194,7 @@ public class FeedServiceImpl implements FeedService{
         }
 
         // 피드 좋아요 개수 업데이트.
-        feed.updateLike(feed.getLike()+1);
+        feed.updateLike(feed.getLikes()+1);
 
         feedRepository.save(feed);
 
@@ -207,7 +206,7 @@ public class FeedServiceImpl implements FeedService{
 
         memberLikesRepository.save(memberLikes);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLike()));
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLikes()));
     }
 
     @Override
@@ -227,7 +226,7 @@ public class FeedServiceImpl implements FeedService{
         }
 
         // 피드 좋아요 개수 업데이트.
-        feed.updateLike(feed.getLike()-1);
+        feed.updateLike(feed.getLikes()-1);
 
         feedRepository.save(feed);
 
@@ -236,6 +235,6 @@ public class FeedServiceImpl implements FeedService{
 
         memberLikesRepository.delete(memberLikes);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLike()));
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLikes()));
     }
 }

@@ -24,7 +24,7 @@ public class Feed extends BaseEntity {
     private String content;
     private int number;
 
-    private int like;
+    private int likes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
@@ -32,7 +32,7 @@ public class Feed extends BaseEntity {
     @OneToMany(mappedBy = "feed", cascade = CascadeType.ALL)
     private List<FeedImage> feedImageList = new ArrayList<>();
 
-    public void updateLike(int like) {
-        this.like = like;
+    public void updateLike(int likes) {
+        this.likes = likes;
     }
 }
