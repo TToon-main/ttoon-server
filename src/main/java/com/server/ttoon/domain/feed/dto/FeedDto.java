@@ -19,4 +19,12 @@ public class FeedDto {
     private LocalDateTime createdDate;
     private int likes;
 
+    @Data
+    @Builder
+    public static class homeFeedDto{
+        private Long feedId;
+        private String thumbnail;
+        private LocalDateTime createdDate;
+    }
+
 }
