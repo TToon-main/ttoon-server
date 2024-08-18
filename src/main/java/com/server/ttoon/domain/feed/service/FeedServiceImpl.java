@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ public class FeedServiceImpl implements FeedService{
 
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         Figure figure = Figure.builder()
                 .name(addCharacterDto.getName())
@@ -71,7 +70,7 @@ public class FeedServiceImpl implements FeedService{
     public ResponseEntity<ApiResponse<?>> changeFeedCharacter(CharacterDto characterDto) {
 
         Figure figure = figureRepository.findById(characterDto.getId())
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         figure.updateCharacter(characterDto.getName(), characterDto.getInfo());
 
@@ -83,7 +82,7 @@ public class FeedServiceImpl implements FeedService{
 
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
 
         List<Figure> figures = figureRepository.findAllByMember(member);
@@ -101,7 +100,7 @@ public class FeedServiceImpl implements FeedService{
     public ResponseEntity<ApiResponse<?>> deleteFeedCharacter(Long characterId) {
 
         Figure figure = figureRepository.findById(characterId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         figureRepository.delete(figure);
 
@@ -115,7 +114,7 @@ public class FeedServiceImpl implements FeedService{
         Long memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         // 페이지 번호, 사이즈 지정해서 Pageable 객체 생성.
         Pageable pageable = PageRequest.of(page, size);
@@ -185,7 +184,7 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         // 유저가 이미 좋아요한 피드인지 확인.
         Optional<MemberLikes> optionalMemberLikes = memberLikesRepository.findByMemberAndFeed(member, feed);
@@ -217,7 +216,7 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         // 유저가 좋아요했던 피드인지 확인
         Optional<MemberLikes> optionalMemberLikes = memberLikesRepository.findByMemberAndFeed(member, feed);

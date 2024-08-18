@@ -11,5 +11,5 @@ public interface MemberRepository extends JpaRepository <Member, Long> {
 
 
    Member findByProviderAndProviderId(Provider provider, String providerId);
- 
+   Optional<Member> findByNickName(String nickName);
 }

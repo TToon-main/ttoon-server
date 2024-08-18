@@ -59,4 +59,11 @@ public class MemberController {
         Long memberId = SecurityUtil.getCurrentMemberId();
         return memberService.revoke(memberId, appleIdentityTokenDto, sender);
     }
+
+    @Operation(summary = "친구 추가", description = "닉네임으로 친구추가를 합니다.")
+    @PostMapping("/friends")
+    public ResponseEntity<ApiResponse<?>> addFriend(@RequestBody String nickName){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return memberService.addFriend(memberId, nickName);
+    }
 }

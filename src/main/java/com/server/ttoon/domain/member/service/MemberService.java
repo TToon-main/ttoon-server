@@ -15,5 +15,6 @@ public interface MemberService {
     ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newImage);
 
     ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AuthorizationCodeDto> appleIdentityTokenDto, String sender) throws IOException;
+    ResponseEntity<ApiResponse<?>> addFriend(Long memberId, String nickName);
 
 }
