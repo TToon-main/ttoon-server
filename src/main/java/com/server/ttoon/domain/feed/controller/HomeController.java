@@ -28,4 +28,12 @@ public class HomeController {
 
         return homeService.getCallender(yearMonth, memberId);
     }
+
+    @GetMapping("/home")
+    public ResponseEntity<ApiResponse<?>> getOneFeed(@RequestParam("date") LocalDate date){
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        return homeService.getOneFeed(date, memberId);
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +136,7 @@ public class FeedServiceImpl implements FeedService{
                 .toList();
 
         // 오늘 쓴 피드 있다면 리스트에 추가하기
-        Optional<Feed> feedOptional = feedRepository.findByCreatedAtAndMember(LocalDateTime.now(), member);
+        Optional<Feed> feedOptional = feedRepository.findByCreatedAtAndMember(LocalDate.now(), member);
 
         if(feedOptional.isPresent()){
             Feed feed = feedOptional.get();
@@ -154,27 +155,6 @@ public class FeedServiceImpl implements FeedService{
         }
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
-    }
-
-    @Override
-    public ResponseEntity<ApiResponse<?>> getOneFeed(Long feedId) {
-
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
-
-        List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
-
-        FeedDto feedDto = FeedDto.builder()
-                .title(feed.getTitle())
-                .content(feed.getContent())
-                .imageUrl(feedImageList.stream()
-                        .map(FeedImage::getImageUrl).collect(Collectors.toList())
-                )
-                .createdDate(feed.getCreatedAt())
-                .likes(feed.getLikes())
-                .build();
-
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDto));
     }
 
     @Override
