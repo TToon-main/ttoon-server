@@ -26,10 +26,10 @@ public class FeedController {
     @GetMapping("/feeds")
     public ResponseEntity<ApiResponse<?>> getFeeds(@RequestParam(name = "page", required = true) int page,
                                                    @RequestParam(name = "size", required = true) int size,
-                                                   @RequestParam(name = "myFilter", required = true) Boolean myFilter
+                                                   @RequestParam(name = "onlyMine", required = true) Boolean onlyMine
                                                    ){
 
-        return feedService.getFeeds(page, size, myFilter);
+        return feedService.getFeeds(page, size, onlyMine);
     }
 
     @Operation(summary = "좋아요 추가", description = "피드 좋아요를 추가합니다.")

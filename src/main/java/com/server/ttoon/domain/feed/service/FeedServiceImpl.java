@@ -135,26 +135,15 @@ public class FeedServiceImpl implements FeedService{
                 )
                 .toList();
 
-        // 오늘 쓴 피드 있다면 리스트에 추가하기
-        Optional<Feed> feedOptional = feedRepository.findByCreatedAtAndMember(LocalDate.now(), member);
+        if(myFilter){
 
-        if(feedOptional.isPresent()){
-            Feed feed = feedOptional.get();
+            
 
-            FeedDto feedDto = FeedDto.builder()
-                    .feedId(feed.getId())
-                    .title(feed.getTitle())
-                    .content(feed.getContent())
-                    .imageUrl(feed.getFeedImageList().stream()
-                            .map(FeedImage::getImageUrl).collect(Collectors.toList())
-                    )
-                    .createdDate(feed.getCreatedAt())
-                    .build();
-
-            feedDtoList.add(feedDto);
+            return null;
         }
-
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
+        else{
+            return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
+        }
     }
 
     @Override
