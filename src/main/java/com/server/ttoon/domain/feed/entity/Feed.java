@@ -35,4 +35,16 @@ public class Feed extends BaseEntity {
     public void updateLike(int likes) {
         this.likes = likes;
     }
+
+    public String getThumbnail(){
+        String thunmbnail = null;
+
+        for (FeedImage feedImage : feedImageList) {
+            if(feedImage.getIsFirst()){
+                thunmbnail = feedImage.getImageUrl();
+            }
+        }
+
+        return thunmbnail;
+    }
 }
