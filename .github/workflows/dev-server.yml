@@ -22,7 +22,7 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application-dev.yml
-          echo "${{ secrets.APPLICATION_DEV}}" > ./application-dev.yml   
+          echo "${{ secrets.APPLICATION_DEV}}" > ./application-dev.yml
 
       - name: Make .p8 file
         run: |
