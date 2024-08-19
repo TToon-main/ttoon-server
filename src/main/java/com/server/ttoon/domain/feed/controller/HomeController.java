@@ -22,7 +22,7 @@ public class HomeController {
     private final HomeService homeService;
 
     @GetMapping("/home/callender")
-    public ResponseEntity<ApiResponse<?>> getCallender(@RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth){
+    public ResponseEntity<ApiResponse<?>> getCallender(@RequestParam(name = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
@@ -30,7 +30,7 @@ public class HomeController {
     }
 
     @GetMapping("/home")
-    public ResponseEntity<ApiResponse<?>> getOneFeed(@RequestParam("date") LocalDate date){
+    public ResponseEntity<ApiResponse<?>> getOneFeed(@RequestParam(name = "date") LocalDate date){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
