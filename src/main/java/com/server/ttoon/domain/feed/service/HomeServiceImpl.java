@@ -22,9 +22,6 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.server.ttoon.common.response.status.ErrorStatus.FEED_NOT_FOUND_ERROR;
-import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERREOR;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -37,7 +34,7 @@ public class HomeServiceImpl implements HomeService{
     public ResponseEntity<ApiResponse<?>> getCallender(YearMonth yearMonth, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
         List<Feed> feedList = feedRepository.findAllByMemberAndAndCreatedAt(member, yearMonth.toString());
 
@@ -56,7 +53,7 @@ public class HomeServiceImpl implements HomeService{
     public ResponseEntity<ApiResponse<?>> getOneFeed(LocalDate localDate, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
         Feed feed = feedRepository.findByCreatedAtAndMember(localDate, member)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 날짜: " + localDate + " 에 올린 피드가 없습니다."));
