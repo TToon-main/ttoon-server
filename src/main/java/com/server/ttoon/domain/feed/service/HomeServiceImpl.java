@@ -36,7 +36,7 @@ public class HomeServiceImpl implements HomeService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
-        List<Feed> feedList = feedRepository.findAllByMemberAndAndCreatedAt(member, yearMonth.toString());
+        List<Feed> feedList = feedRepository.findAllByMemberAndCreatedAt(member, yearMonth.toString());
 
         List<FeedDto.homeFeedDto> homeFeedDtos = feedList.stream()
                 .map(feed -> FeedDto.homeFeedDto.builder()
