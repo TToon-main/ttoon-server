@@ -27,4 +27,5 @@ public class Friend extends BaseEntity {
     public void changeStatus(Status status){
         this.status = status;
     }
+
 }
