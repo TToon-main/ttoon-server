@@ -7,9 +7,9 @@ import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.dto.response.AccountResponseDto;
-import com.server.ttoon.domain.member.entity.Member;
-import com.server.ttoon.domain.member.entity.Provider;
-import com.server.ttoon.domain.member.entity.RevokeReason;
+import com.server.ttoon.domain.member.dto.response.FriendInfoDto;
+import com.server.ttoon.domain.member.entity.*;
+import com.server.ttoon.domain.member.repository.FriendRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.domain.member.repository.RevokeReasonRepository;
 import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
@@ -45,8 +45,7 @@ import java.security.PrivateKey;
 import java.util.*;
 
 import static com.server.ttoon.common.response.ApiResponse.*;
-import static com.server.ttoon.common.response.status.ErrorStatus.BADREQUEST_ERROR;
-import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERREOR;
+import static com.server.ttoon.common.response.status.ErrorStatus.*;
 import static com.server.ttoon.common.response.status.SuccessStatus.*;
 
 @Service
@@ -58,12 +57,13 @@ public class MemberServiceImpl implements MemberService{
     private final RevokeReasonRepository revokeReasonRepository;
     private final S3Service s3Service;
     private final AppleProperties appleProperties;
+    private final FriendRepository friendRepository;
 
     // 프로필 + 계정 정보 조회 메소드
     public ResponseEntity<ApiResponse<?>> getAccountInfo(Long memberId){
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
         // 이미지의 presignedUrl 받아오기
         String image = member.getImage();
@@ -84,7 +84,7 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newImage) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
         s3Service.deleteImage(member.getImage());
 
@@ -100,7 +100,7 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     public ResponseEntity<ApiResponse<?>> revoke(Long memberId, Optional<AuthorizationCodeDto> appleIdentityTokenDto, String sender) throws IOException {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(memberId.toString()).orElse(null);
 
         if(appleIdentityTokenDto.isEmpty())
@@ -128,6 +128,75 @@ public class MemberServiceImpl implements MemberService{
         return ResponseEntity.ok(onSuccess(_OK));
     }
 
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> addFriend(Long memberId, String nickName){
+        Member invitor = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+        Member invitee = memberRepository.findByNickName(nickName).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+
+        if(friendRepository.existsByInviteeAndInvitor(invitee,invitor) || friendRepository.existsByInvitorAndInvitee(invitee,invitor))
+            throw new CustomRuntimeException(FRIEND_EXIST_ERROR);
+
+        Friend friend = Friend.builder()
+                .invitee(invitee)
+                .invitor(invitor)
+                .status(Status.WAITING)
+                .build();
+        friendRepository.save(friend);
+        return ResponseEntity.ok(onSuccess(_OK));
+    }
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> acceptInvite(Long friendId){
+        Friend friend = friendRepository.findById(friendId).get();
+        friend.changeStatus(Status.ACCEPT);
+        friendRepository.save(friend);
+
+        return ResponseEntity.ok(onSuccess(_OK));
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> deleteFriend(Long friendId){
+        Friend friend = friendRepository.findById(friendId).get();
+        friendRepository.delete(friend);
+
+        return ResponseEntity.ok(onSuccess(_OK));
+    }
+
+    public ResponseEntity<ApiResponse<?>> getFriends(Long memberId){
+        List<FriendInfoDto> friendInfoDtoList = new ArrayList<>();
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+        List<Friend> friendList = friendRepository.findAllByStatus(Status.ACCEPT);
+        List<Friend> askList = friendRepository.findAllByInviteeAndStatus(member, Status.WAITING);
+        for(Friend friend : friendList){
+            Long findId;
+            if(friend.getInvitee().getId() == memberId)
+                findId = friend.getInvitor().getId();
+            else
+                findId = friend.getInvitee().getId();
+
+            Member friendMember = memberRepository.findById(findId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+            String image = friendMember.getImage();
+            String url = s3Service.getPresignedURL(image);
+            FriendInfoDto friendInfoDto = FriendInfoDto.builder()
+                    .nickName(friendMember.getNickName())
+                    .status(friend.getStatus())
+                    .profileUrl(url)
+                    .build();
+            friendInfoDtoList.add(friendInfoDto);
+        }
+        for(Friend askFriend : askList){
+            Member friendMember = memberRepository.findById(askFriend.getInvitor().getId()).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+            String image = friendMember.getImage();
+            String url = s3Service.getPresignedURL(image);
+            FriendInfoDto friendInfoDto = FriendInfoDto.builder()
+                    .nickName(friendMember.getNickName())
+                    .status(askFriend.getStatus())
+                    .profileUrl(url)
+                    .build();
+            friendInfoDtoList.add(friendInfoDto);
+        }
+        return ResponseEntity.ok(onSuccess(_OK,friendInfoDtoList));
+    }
     private void appleServiceRevoke(AppleAuthTokenResponse appleAuthToken) throws IOException {
         if (appleAuthToken.getAccessToken() != null) {
             RestTemplate restTemplate = new RestTemplateBuilder().build();

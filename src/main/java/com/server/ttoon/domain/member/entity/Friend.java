@@ -23,4 +23,9 @@ public class Friend extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member invitee;
+
+    public void changeStatus(Status status){
+        this.status = status;
+    }
+
 }
