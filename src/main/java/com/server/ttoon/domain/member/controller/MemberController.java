@@ -59,4 +59,30 @@ public class MemberController {
         Long memberId = SecurityUtil.getCurrentMemberId();
         return memberService.revoke(memberId, appleIdentityTokenDto, sender);
     }
+
+    @Operation(summary = "친구 초대", description = "닉네임으로 친구추가를 합니다.")
+    @PostMapping("/friends")
+    public ResponseEntity<ApiResponse<?>> addFriend(@RequestBody String nickName){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return memberService.addFriend(memberId, nickName);
+    }
+
+    @Operation(summary = "친구 초대 수락", description = "친구 초대를 수락합니다.")
+    @PatchMapping("/friends/{friendId}")
+    public ResponseEntity<ApiResponse<?>> acceptInvite(@PathVariable("friendId") Long friendId){
+        return memberService.acceptInvite(friendId);
+    }
+
+    @Operation(summary = "친구 초대 거절/ 친구 삭제", description = "친구 초대를 거절하거나 친구에서 삭제합니다.")
+    @DeleteMapping("/friends/{friendId}")
+    public ResponseEntity<ApiResponse<?>> deleteFriend(@PathVariable("friendId") Long friendId){
+        return memberService.deleteFriend(friendId);
+    }
+
+    @Operation(summary = "친구 목록 조회", description = "현재 사용자의 친구 목록을 조회합니다.")
+    @GetMapping("/friends")
+    public ResponseEntity<ApiResponse<?>> getFriends(){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return memberService.getFriends(memberId);
+    }
 }

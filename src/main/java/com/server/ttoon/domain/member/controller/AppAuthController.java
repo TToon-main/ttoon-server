@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERREOR;
+import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERROR;
 
 @Tag(name = "Auth API", description = "로그인 및 회원가입 기능")
 @RestController
@@ -42,7 +42,7 @@ public class AppAuthController {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR));
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
         return appAuthService.join(member);
     }
 

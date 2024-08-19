@@ -1,8 +1,6 @@
 package com.server.ttoon.security.jwt;
 
 import com.server.ttoon.common.exception.CustomRuntimeException;
-import com.server.ttoon.common.response.status.ErrorStatus;
-import com.server.ttoon.domain.member.entity.Authority;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.auth.PrincipalDetails;
@@ -25,9 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERREOR;
-import static com.server.ttoon.domain.member.entity.Authority.*;
-import static com.server.ttoon.domain.member.entity.Authority.ROLE_ADMIN;
+import static com.server.ttoon.common.response.status.ErrorStatus.MEMBER_NOT_FOUND_ERROR;
 
 @Slf4j
 @Component
@@ -92,7 +88,7 @@ public class TokenProvider {
         // UserDetails 객체를 만들어서 Authentication 리턴
         Member member = memberRepository.findById(Long.parseLong(claims.getSubject())).orElse(null);
         if(member == null)
-            throw new CustomRuntimeException(MEMBER_NOT_FOUND_ERREOR);
+            throw new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR);
         UserDetails principal = new PrincipalDetails(member);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }

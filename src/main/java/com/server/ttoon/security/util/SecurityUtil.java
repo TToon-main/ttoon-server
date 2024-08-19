@@ -4,10 +4,7 @@ package com.server.ttoon.security.util;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.security.auth.PrincipalDetails;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.security.spec.EdDSAParameterSpec;
 
 public class SecurityUtil {
     private SecurityUtil() { }
@@ -19,7 +16,7 @@ public class SecurityUtil {
         final PrincipalDetails principalDetails = (PrincipalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principalDetails.getMember() == null || principalDetails.getUsername() == null)
-            throw new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERREOR);
+            throw new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR);
 
         return Long.parseLong(principalDetails.getUsername());
     }
