@@ -39,7 +39,7 @@ public class MemberController {
     }
 
     @Operation(summary = "프로필 정보 수정", description = "사용자의 프로필 정보를 수정합니다.")
-    @PatchMapping( value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PatchMapping( value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<?>> modifyProfile(@RequestPart("file") MultipartFile file, @RequestPart("modifyRequestDto") ModifyRequestDto modifyRequestDto) throws IOException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
