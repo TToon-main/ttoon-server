@@ -86,20 +86,24 @@ public class MemberServiceImpl implements MemberService{
 
         Optional<Member> memberOptional = memberRepository.findByNickName(nickName);
 
-        if(memberOptional.isPresent()){
-            throw new CustomRuntimeException(NICKNAME_EXIST_ERROR);
-        }
-
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
-        if(!member.getImage().isEmpty()){
+        if(memberOptional.isPresent() && memberOptional.get() != member){
+            throw new CustomRuntimeException(NICKNAME_EXIST_ERROR);
+        }
+
+        if(member.getImage() != null){
             s3Service.deleteImage(member.getImage());
         }
 
-        member.updateNickName(nickName);
+        if(nickName != null){
+            member.updateNickName(nickName);
+        }
 
-        member.updateImage(newImage);
+        if(newImage != null){
+            member.updateImage(newImage);
+        }
 
         memberRepository.save(member);
 
