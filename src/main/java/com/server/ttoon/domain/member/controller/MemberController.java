@@ -38,7 +38,7 @@ public class MemberController {
 
     @Operation(summary = "프로필 정보 수정", description = "사용자의 프로필 정보를 수정합니다.")
     @PostMapping( value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ApiResponse<?>> modifyProfile(@RequestPart(value = "file", required = true) MultipartFile file, @RequestPart(value = "nickName", required = true) String nickName) throws IOException {
+    public ResponseEntity<ApiResponse<?>> modifyProfile(@RequestPart(value = "file", required = false) MultipartFile file, @RequestPart(value = "nickName", required = false) String nickName) throws IOException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 

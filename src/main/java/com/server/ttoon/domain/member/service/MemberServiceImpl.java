@@ -83,6 +83,12 @@ public class MemberServiceImpl implements MemberService{
     @Transactional
     public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, String nickName, String newImage) {
 
+        Optional<Member> memberOptional = memberRepository.findByNickName(nickName);
+
+        if(memberOptional.isPresent()){
+            throw new CustomRuntimeException(NICKNAME_EXIST_ERROR);
+        }
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
