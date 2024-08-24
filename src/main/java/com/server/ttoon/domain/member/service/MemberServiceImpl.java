@@ -82,7 +82,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, String nickName, String newImage) {
+    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, String nickName, String newImage, Boolean isDelete) {
 
         Optional<Member> memberOptional = memberRepository.findByNickName(nickName);
 
@@ -98,11 +98,17 @@ public class MemberServiceImpl implements MemberService{
         }
 
         if(nickName != null){
-            member.updateNickName(nickName);
+            if(!nickName.isBlank()){
+                member.updateNickName(nickName);
+            }
         }
 
         if(newImage != null){
             member.updateImage(newImage);
+        }
+
+        if(isDelete){
+            member.updateImage(null);
         }
 
         memberRepository.save(member);
