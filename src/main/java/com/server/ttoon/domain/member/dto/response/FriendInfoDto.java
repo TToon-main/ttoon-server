@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class FriendInfoDto {
     private String nickName;
     private String profileUrl;
-    private Status status;
+    private Long friendId;
 }

@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -79,10 +81,10 @@ public class MemberController {
         return memberService.deleteFriend(friendId);
     }
 
-    @Operation(summary = "친구 목록 조회", description = "현재 사용자의 친구 목록을 조회합니다.")
+    @Operation(summary = "현재 내 친구 목록 조회", description = "현재 사용자의 친구 목록을 조회합니다.")
     @GetMapping("/friends")
-    public ResponseEntity<ApiResponse<?>> getFriends(){
+    public ResponseEntity<ApiResponse<?>> getFriends(@PageableDefault(size = 10) Pageable pageable){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return memberService.getFriends(memberId);
+        return memberService.getFriends(memberId,pageable);
     }
 }
