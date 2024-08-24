@@ -36,7 +36,7 @@ public class HomeServiceImpl implements HomeService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
-        List<Feed> feedList = feedRepository.findAllByMemberAndCreatedAt(member, yearMonth.toString());
+        List<Feed> feedList = feedRepository.findAllByMemberAndCreatedAt(member.getId(), yearMonth.toString());
 
         List<FeedDto.homeFeedDto> homeFeedDtos = feedList.stream()
                 .map(feed -> FeedDto.homeFeedDto.builder()
@@ -55,8 +55,12 @@ public class HomeServiceImpl implements HomeService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
+        if(localDate == null){
+            localDate = LocalDate.now();
+        }
+
         Feed feed = feedRepository.findByCreatedAtAndMember(localDate, member)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 날짜: " + localDate + " 에 올린 피드가 없습니다."));
+                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.FEED_NOT_FOUND_ERROR));
 
         List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
 

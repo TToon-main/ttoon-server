@@ -40,8 +40,8 @@ public class MemberController {
     }
 
     @Operation(summary = "프로필 정보 수정", description = "사용자의 프로필 정보를 수정합니다.")
-    @PostMapping( value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ApiResponse<?>> modifyProfile(@RequestPart(value = "file", required = true) MultipartFile file, @RequestPart(value = "nickName", required = true) String nickName) throws IOException {
+    @PostMapping( value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<?>> modifyProfile(@RequestPart(value = "file", required = false) MultipartFile file, @RequestParam(value = "nickName", required = false) String nickName, @RequestParam(value = "isDelete") Boolean isDelete) throws IOException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
@@ -50,7 +50,7 @@ public class MemberController {
             newImage = s3Service.saveFile(file, "images");
         }
 
-        return memberService.modifyProfile(memberId, nickName, newImage);
+        return memberService.modifyProfile(memberId, nickName, newImage, isDelete);
     }
 
     @Operation(summary = "서비스 탈퇴", description = "로그인한 사용자의 앱/웹 서비스를 탈퇴합니다.")

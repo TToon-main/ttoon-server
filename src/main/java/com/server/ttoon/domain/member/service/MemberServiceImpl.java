@@ -82,18 +82,34 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, String nickName, String newImage) {
+    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, String nickName, String newImage, Boolean isDelete) {
+
+        Optional<Member> memberOptional = memberRepository.findByNickName(nickName);
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
-        if(!member.getImage().isEmpty()){
+        if(memberOptional.isPresent() && memberOptional.get() != member){
+            throw new CustomRuntimeException(NICKNAME_EXIST_ERROR);
+        }
+
+        if(member.getImage() != null){
             s3Service.deleteImage(member.getImage());
         }
 
-        member.updateNickName(nickName);
+        if(nickName != null){
+            if(!nickName.isBlank()){
+                member.updateNickName(nickName);
+            }
+        }
 
-        member.updateImage(newImage);
+        if(newImage != null){
+            member.updateImage(newImage);
+        }
+
+        if(isDelete){
+            member.updateImage(null);
+        }
 
         memberRepository.save(member);
 
