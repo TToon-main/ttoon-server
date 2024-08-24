@@ -1,5 +1,6 @@
 package com.server.ttoon.domain.feed.service;
 
+import com.amazonaws.services.secretsmanager.model.ResourceNotFoundException;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.SuccessStatus;
@@ -12,8 +13,11 @@ import com.server.ttoon.domain.feed.entity.FeedImage;
 import com.server.ttoon.domain.feed.repository.FigureRepository;
 import com.server.ttoon.domain.feed.repository.FeedImageRepository;
 import com.server.ttoon.domain.feed.repository.FeedRepository;
+import com.server.ttoon.domain.member.entity.Friend;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.entity.MemberLikes;
+import com.server.ttoon.domain.member.entity.Status;
+import com.server.ttoon.domain.member.repository.FriendRepository;
 import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.util.SecurityUtil;
@@ -21,11 +25,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +50,7 @@ public class FeedServiceImpl implements FeedService{
     private final FeedRepository feedRepository;
     private final FeedImageRepository feedImageRepository;
     private final MemberLikesRepository memberLikesRepository;
+    private final FriendRepository friendRepository;
 
     @Override
     @Transactional
@@ -117,64 +124,74 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         // 페이지 번호, 사이즈 지정해서 Pageable 객체 생성.
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Slice<Feed> feedSlice = feedRepository.findAllByMember(member, pageable);
+        // 나만 보기 bool 값 1일때
+        if(myFilter){
 
-        // feedSlice 를 DTO 타입 리스트로 변환하기
-        List<FeedDto> feedDtoList = feedSlice.stream()
-                .map(feed -> FeedDto.builder()
-                        .feedId(feed.getId())
-                        .title(feed.getTitle())
-                        .imageUrl(feed.getFeedImageList().stream()
-                                .map(FeedImage::getImageUrl).collect(Collectors.toList()))
-                        .createdDate(feed.getCreatedAt())
-                        .likes(feed.getLikes())
-                        .build()
-                )
-                .toList();
+            List<Member> friendList = new ArrayList<>();
 
-        // 오늘 쓴 피드 있다면 리스트에 추가하기
-        Optional<Feed> feedOptional = feedRepository.findByCreatedAtAndMember(LocalDateTime.now(), member);
+            // status 수락 상태인 친구테이블의 튜플들 가져오기
+            List<Friend> acceptList = friendRepository.findAllByStatus(Status.ACCEPT);
 
-        if(feedOptional.isPresent()){
-            Feed feed = feedOptional.get();
+            List<Feed> feedList = null;
 
-            FeedDto feedDto = FeedDto.builder()
-                    .feedId(feed.getId())
-                    .title(feed.getTitle())
-                    .content(feed.getContent())
-                    .imageUrl(feed.getFeedImageList().stream()
-                            .map(FeedImage::getImageUrl).collect(Collectors.toList())
+            // 튜플들 중, member 와 친구인 튜플들만 뽑고, 친구의 피드들을 feedList 에 추가.
+            for (Friend friend : acceptList) {
+                Long friendId;
+                if(friend.getInvitor().getId() == memberId){
+                    friendId = friend.getInvitee().getId();
+                }
+                else if(friend.getInvitee().getId() == memberId){
+                    friendId = friend.getInvitor().getId();
+                }
+                else{
+                    friendId = null;
+                    continue;
+                }
+
+                Member friendMember = memberRepository.findById(friendId)
+                        .orElseThrow(() -> new ResourceNotFoundException("memberId: " + friendId + " 에 해당하는 친구인 유저가 존재하지 않습니다."));
+
+                friendList.add(friendMember);
+            }
+
+            Slice<Feed> feedSlice = feedRepository.findAllByMemberAndFriends(member, friendList, pageable);
+
+            // feedSlice 를 DTO 타입 리스트로 변환하기
+            List<FeedDto> feedDtoList = feedSlice.stream()
+                    .map(feed -> FeedDto.builder()
+                            .feedId(feed.getId())
+                            .title(feed.getTitle())
+                            .imageUrl(feed.getFeedImageList().stream()
+                                    .map(FeedImage::getImageUrl).collect(Collectors.toList()))
+                            .createdDate(feed.getCreatedAt())
+                            .likes(feed.getLikes())
+                            .build()
                     )
-                    .createdDate(feed.getCreatedAt())
-                    .build();
+                    .toList();
 
-            feedDtoList.add(feedDto);
+            return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
         }
+        else{ // 나만 보기 bool 값 0일 때
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
-    }
+            Slice<Feed> feedSlice = feedRepository.findAllByMember(member, pageable);
 
-    @Override
-    public ResponseEntity<ApiResponse<?>> getOneFeed(Long feedId) {
+            // feedSlice 를 DTO 타입 리스트로 변환하기
+            List<FeedDto> feedDtoList = feedSlice.stream()
+                    .map(feed -> FeedDto.builder()
+                            .feedId(feed.getId())
+                            .title(feed.getTitle())
+                            .imageUrl(feed.getFeedImageList().stream()
+                                    .map(FeedImage::getImageUrl).collect(Collectors.toList()))
+                            .createdDate(feed.getCreatedAt())
+                            .likes(feed.getLikes())
+                            .build()
+                    )
+                    .toList();
 
-        Feed feed = feedRepository.findById(feedId)
-                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
-
-        List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
-
-        FeedDto feedDto = FeedDto.builder()
-                .title(feed.getTitle())
-                .content(feed.getContent())
-                .imageUrl(feedImageList.stream()
-                        .map(FeedImage::getImageUrl).collect(Collectors.toList())
-                )
-                .createdDate(feed.getCreatedAt())
-                .likes(feed.getLikes())
-                .build();
-
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDto));
+            return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
+        }
     }
 
     @Override

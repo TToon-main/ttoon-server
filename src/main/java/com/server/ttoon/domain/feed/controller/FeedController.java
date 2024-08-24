@@ -26,17 +26,10 @@ public class FeedController {
     @GetMapping("/feeds")
     public ResponseEntity<ApiResponse<?>> getFeeds(@RequestParam(name = "page", required = true) int page,
                                                    @RequestParam(name = "size", required = true) int size,
-                                                   @RequestParam(name = "myFilter", required = true) Boolean myFilter
+                                                   @RequestParam(name = "onlyMine", required = true) Boolean onlyMine
                                                    ){
 
-        return feedService.getFeeds(page, size, myFilter);
-    }
-
-    @Operation(summary = "단일 피드 조회", description = "피드 하나의 데이터를 조회합니다.")
-    @GetMapping("/feeds/{feedId}")
-    public ResponseEntity<ApiResponse<?>> getOneFeed(@PathVariable("feedId") Long feedId) {
-
-        return feedService.getOneFeed(feedId);
+        return feedService.getFeeds(page, size, onlyMine);
     }
 
     @Operation(summary = "좋아요 추가", description = "피드 좋아요를 추가합니다.")
@@ -53,7 +46,7 @@ public class FeedController {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        return feedService.addLike(memberId, feedId);
+        return feedService.deleteLike(memberId, feedId);
     }
 
     @Operation(summary = "등장인물 추가", description = "사용자의 기록 속 새로운 등장인물을 추가합니다.")

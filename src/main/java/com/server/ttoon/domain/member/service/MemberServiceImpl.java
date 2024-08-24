@@ -82,14 +82,16 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Transactional
-    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, ModifyRequestDto modifyRequestDto, String newImage) {
+    public ResponseEntity<ApiResponse<?>> modifyProfile(Long memberId, String nickName, String newImage) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
-        s3Service.deleteImage(member.getImage());
+        if(!member.getImage().isEmpty()){
+            s3Service.deleteImage(member.getImage());
+        }
 
-        member.updateNickName(modifyRequestDto.getNickName());
+        member.updateNickName(nickName);
 
         member.updateImage(newImage);
 
