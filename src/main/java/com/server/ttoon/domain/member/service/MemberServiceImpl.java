@@ -26,6 +26,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -163,40 +164,32 @@ public class MemberServiceImpl implements MemberService{
         return ResponseEntity.ok(onSuccess(_OK));
     }
 
-    public ResponseEntity<ApiResponse<?>> getFriends(Long memberId){
+    public ResponseEntity<ApiResponse<?>> getFriends(Long memberId, Pageable pageable){
         List<FriendInfoDto> friendInfoDtoList = new ArrayList<>();
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
-        List<Friend> friendList = friendRepository.findAllByStatus(Status.ACCEPT);
-        List<Friend> askList = friendRepository.findAllByInviteeAndStatus(member, Status.WAITING);
+        // 내가 초대자이면서 상태가 accept인거 혹은 내가 초대받은 자이면서 상태가 accept인거 페이징 적용해서 레포지토리에서 찾음
+        List<Friend> friendList = friendRepository.findByInvitorAndStatusOrInviteeAndStatus(member,Status.ACCEPT,member,Status.ACCEPT,pageable);
         for(Friend friend : friendList){
             Long findId;
+            // 만약 friend의 Invitee와 현재 접속중인 memberId가 같다면 findId는 invitorId가 되어야함
             if(friend.getInvitee().getId() == memberId)
                 findId = friend.getInvitor().getId();
+            // 아니라면 findId는 invitee가 됨
             else
                 findId = friend.getInvitee().getId();
 
-            Member friendMember = memberRepository.findById(findId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
-            String image = friendMember.getImage();
+            Member findMember = memberRepository.findById(findId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+            String image = findMember.getImage();
             String url = s3Service.getPresignedURL(image);
             FriendInfoDto friendInfoDto = FriendInfoDto.builder()
-                    .nickName(friendMember.getNickName())
-                    .status(friend.getStatus())
+                    .friendId(friend.getId())
                     .profileUrl(url)
+                    .nickName(findMember.getNickName())
                     .build();
             friendInfoDtoList.add(friendInfoDto);
         }
-        for(Friend askFriend : askList){
-            Member friendMember = memberRepository.findById(askFriend.getInvitor().getId()).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
-            String image = friendMember.getImage();
-            String url = s3Service.getPresignedURL(image);
-            FriendInfoDto friendInfoDto = FriendInfoDto.builder()
-                    .nickName(friendMember.getNickName())
-                    .status(askFriend.getStatus())
-                    .profileUrl(url)
-                    .build();
-            friendInfoDtoList.add(friendInfoDto);
-        }
+
         return ResponseEntity.ok(onSuccess(_OK,friendInfoDtoList));
     }
     private void appleServiceRevoke(AppleAuthTokenResponse appleAuthToken) throws IOException {

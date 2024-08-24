@@ -3,6 +3,7 @@ package com.server.ttoon.domain.member.service;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
@@ -18,6 +19,6 @@ public interface MemberService {
     ResponseEntity<ApiResponse<?>> addFriend(Long memberId, String nickName);
     ResponseEntity<ApiResponse<?>> acceptInvite(Long friendId);
     ResponseEntity<ApiResponse<?>> deleteFriend(Long friendId);
-    ResponseEntity<ApiResponse<?>> getFriends(Long memberId);
+    ResponseEntity<ApiResponse<?>> getFriends(Long memberId, Pageable pageable);
 
 }

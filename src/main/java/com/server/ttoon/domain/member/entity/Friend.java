@@ -19,9 +19,11 @@ public class Friend extends BaseEntity {
     private Status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invitor_member_id")
     private Member invitor;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invitee_member_id")
     private Member invitee;
 
     public void changeStatus(Status status){

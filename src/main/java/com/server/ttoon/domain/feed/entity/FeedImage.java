@@ -19,6 +19,7 @@ public class FeedImage {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "feed_id")
     private Feed feed;
 
     private Boolean isFirst;
