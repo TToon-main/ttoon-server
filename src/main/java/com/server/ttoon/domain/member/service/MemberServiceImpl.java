@@ -104,6 +104,9 @@ public class MemberServiceImpl implements MemberService{
         }
 
         if(newImage != null){
+            if(isDelete){
+                throw new CustomRuntimeException(BADREQUEST_ERROR);
+            }
             member.updateImage(newImage);
         }
 
