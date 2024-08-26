@@ -26,14 +26,6 @@ public class Member extends BaseEntity {
     private int point;
     private String email;
 
-    private Boolean isChecked;
-    private Boolean monday;
-    private Boolean tuesday;
-    private Boolean wednesday;
-    private Boolean thursday;
-    private Boolean friday;
-    private Boolean saturday;
-    private Boolean sunday;
 
     public void changeToUser(Member member){
         this.authority = Authority.ROLE_USER;
