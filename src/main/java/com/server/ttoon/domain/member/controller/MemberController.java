@@ -45,8 +45,8 @@ public class MemberController {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        String newImage = null;
-        if (file != null) {
+        String newImage = "";
+        if (file != null && !file.isEmpty()) {
             newImage = s3Service.saveFile(file, "images");
         }
 

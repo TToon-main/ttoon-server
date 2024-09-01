@@ -95,28 +95,22 @@ public class MemberServiceImpl implements MemberService{
             throw new CustomRuntimeException(NICKNAME_EXIST_ERROR);
         }
 
-        if(nickName != null){
-            if(!nickName.isBlank()){
-                member.updateNickName(nickName);
-            }
+        if(!nickName.isBlank() && nickName != null ){
+            member.updateNickName(nickName);
         }
 
-        if(newImage != null){
-            if(member.getImage() != null){
-                if(!member.getImage().isBlank()){
+        if(!newImage.isBlank() && newImage != null){
+            if(member.getImage() != null && !member.getImage().isBlank()){
                     s3Service.deleteImage(member.getImage());
-                }
             }
             member.updateImage(newImage);
         }
         else{
             if(isDelete){
-                if(member.getImage() != null) {
-                    if (!member.getImage().isBlank()) {
+                if(!member.getImage().isBlank() && member.getImage() != null) {
                         s3Service.deleteImage(member.getImage());
-                    }
                 }
-                member.updateImage(null);
+                member.updateImage("");
             }
         }
 

@@ -18,7 +18,7 @@ public class Attendance extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private WeekDay weekDayOfWeek;
 
-    private Boolean status;
+    private Boolean todayStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
