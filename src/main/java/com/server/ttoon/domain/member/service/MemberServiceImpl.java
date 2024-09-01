@@ -20,6 +20,7 @@ import com.server.ttoon.security.oauth.convertor.AppleProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
@@ -50,6 +51,7 @@ import static com.server.ttoon.common.response.status.ErrorStatus.*;
 import static com.server.ttoon.common.response.status.SuccessStatus.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService{
@@ -93,10 +95,6 @@ public class MemberServiceImpl implements MemberService{
             throw new CustomRuntimeException(NICKNAME_EXIST_ERROR);
         }
 
-        if(member.getImage() != null){
-            s3Service.deleteImage(member.getImage());
-        }
-
         if(nickName != null){
             if(!nickName.isBlank()){
                 member.updateNickName(nickName);
@@ -104,14 +102,22 @@ public class MemberServiceImpl implements MemberService{
         }
 
         if(newImage != null){
-            if(isDelete){
-                throw new CustomRuntimeException(BADREQUEST_ERROR);
+            if(member.getImage() != null){
+                if(!member.getImage().isBlank()){
+                    s3Service.deleteImage(member.getImage());
+                }
             }
             member.updateImage(newImage);
         }
-
-        if(isDelete){
-            member.updateImage(null);
+        else{
+            if(isDelete){
+                if(member.getImage() != null) {
+                    if (!member.getImage().isBlank()) {
+                        s3Service.deleteImage(member.getImage());
+                    }
+                }
+                member.updateImage(null);
+            }
         }
 
         memberRepository.save(member);

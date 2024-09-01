@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.server.ttoon.common.exception.CustomRuntimeException;
+import com.server.ttoon.common.response.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.UUID;
+
+import static com.amazonaws.auth.policy.actions.S3Actions.DeleteObject;
 
 @Service
 @RequiredArgsConstructor
@@ -45,11 +49,16 @@ public class S3Service {
     // 이미지 수정으로 인해 기존 이미지 삭제 메소드
     public void deleteImage(String keyName) {
 
-        if(keyName == null){
-            return;
+        boolean isObjectExist = amazonS3.doesObjectExist(bucket, keyName);
+
+        if(isObjectExist){
+            amazonS3.deleteObject(bucket, keyName);
+        }
+        else{
+            throw new CustomRuntimeException(ErrorStatus.BADREQUEST_ERROR);
         }
 
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, keyName));
+
     }
 
     // image url 가져오는 메소드.
