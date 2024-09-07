@@ -8,6 +8,7 @@ import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.dto.response.AccountResponseDto;
 import com.server.ttoon.domain.member.dto.response.FriendInfoDto;
+import com.server.ttoon.domain.member.dto.response.UserInfoDto;
 import com.server.ttoon.domain.member.entity.*;
 import com.server.ttoon.domain.member.repository.FriendRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
@@ -26,6 +27,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -169,11 +171,11 @@ public class MemberServiceImpl implements MemberService{
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
         // 내가 초대자이면서 상태가 accept인거 혹은 내가 초대받은 자이면서 상태가 accept인거 페이징 적용해서 레포지토리에서 찾음
-        List<Friend> friendList = friendRepository.findByInvitorAndStatusOrInviteeAndStatus(member,Status.ACCEPT,member,Status.ACCEPT,pageable);
-        for(Friend friend : friendList){
+        Page<Friend> friendList = friendRepository.findByInvitorAndStatusOrInviteeAndStatus(member,Status.ACCEPT,member,Status.ACCEPT,pageable);
+        for(Friend friend : friendList.getContent()){
             Long findId;
             // 만약 friend의 Invitee와 현재 접속중인 memberId가 같다면 findId는 invitorId가 되어야함
-            if(friend.getInvitee().getId() == memberId)
+            if(friend.getInvitee().getId().equals(memberId))
                 findId = friend.getInvitor().getId();
             // 아니라면 findId는 invitee가 됨
             else
@@ -216,6 +218,89 @@ public class MemberServiceImpl implements MemberService{
         }
         return ResponseEntity.ok(onSuccess(_OK,friendInfoDtoList));
     }
+    public ResponseEntity<ApiResponse<?>> getSearchUsers(Long memberId, Pageable pageable,String name){
+        List<UserInfoDto> userInfoDtoList = new ArrayList<>();
+
+        // 현재 사용자 조회
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+        // 찾으려는 사용자 조회
+        List<Member> users = memberRepository.findByNickNameContainingIgnoreCase(name);
+        for(Member user : users){
+            String image = user.getImage();
+            String url = s3Service.getPresignedURL(image);
+            // 1. 아무 상태도 아닌 유저 조회
+            // 친구 테이블에 정보가 초대자 초대받은자 정보가 없다면 아무상태도 아닌것이다.
+            if(!friendRepository.existsByInviteeAndInvitor(user,member) && !friendRepository.existsByInviteeAndInvitor(member, user))
+            {
+                // friendId 는 Null값 방지로 -1로 고정
+                UserInfoDto userInfoDto = UserInfoDto.builder()
+                        .friendId(-1L)
+                        .profileUrl(url)
+                        .status(Status.NOTHING)
+                        .nickName(user.getNickName())
+                        .build();
+                userInfoDtoList.add(userInfoDto);
+            }
+            // 2. 친구요청을 받은 상태
+            // 친구테이블에 내가 invitee로 있고 검색된 유저는 invitor로 있고 status가 waiting이다.
+            else if(friendRepository.existsByInviteeAndInvitorAndStatus(member,user,Status.WAITING)){
+                Friend friend = friendRepository.findByInviteeAndInvitorAndStatus(member,user,Status.WAITING)
+                        .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+                UserInfoDto userInfoDto = UserInfoDto.builder()
+                        .friendId(friend.getId())
+                        .profileUrl(url)
+                        .status(Status.ASKING)
+                        .nickName(user.getNickName())
+                        .build();
+                userInfoDtoList.add(userInfoDto);
+            }
+            // 3. 친구요청을 한 상태
+            // 친구테이블에 내가 invitor로 있고 검색된 유저는 invitee로 있고 status가 wationg이다.
+            else if(friendRepository.existsByInviteeAndInvitorAndStatus(user,member,Status.WAITING)){
+                Friend friend = friendRepository.findByInviteeAndInvitorAndStatus(user,member,Status.WAITING)
+                        .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+                UserInfoDto userInfoDto = UserInfoDto.builder()
+                        .friendId(friend.getId())
+                        .profileUrl(url)
+                        .status(Status.WAITING)
+                        .nickName(user.getNickName())
+                        .build();
+                userInfoDtoList.add(userInfoDto);
+            }
+            // 4. 이미 친구인 상태
+            // 친구테이블에 나또는 유저가 Invitor 혹은 invitee로 존재하고 status가 accept이다.
+            else if(friendRepository.existsByInviteeAndInvitorAndStatus(member,user,Status.ACCEPT)){
+                Friend friend = friendRepository.findByInviteeAndInvitorAndStatus(member,user,Status.ACCEPT)
+                            .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+                UserInfoDto userInfoDto = UserInfoDto.builder()
+                        .friendId(friend.getId())
+                        .profileUrl(url)
+                        .status(Status.WAITING)
+                        .nickName(user.getNickName())
+                        .build();
+                userInfoDtoList.add(userInfoDto);
+                }
+            else if(friendRepository.existsByInviteeAndInvitorAndStatus(user,member,Status.ACCEPT)){
+                Friend friend = friendRepository.findByInviteeAndInvitorAndStatus(user,member,Status.ACCEPT)
+                        .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+                UserInfoDto userInfoDto = UserInfoDto.builder()
+                        .friendId(friend.getId())
+                        .profileUrl(url)
+                        .status(Status.WAITING)
+                        .nickName(user.getNickName())
+                        .build();
+                userInfoDtoList.add(userInfoDto);
+            }
+        }
+        // 닉네임 기준으로 사전순 정렬
+        userInfoDtoList.sort(Comparator.comparing(UserInfoDto::getNickName));
+
+        //페이징 처리
+        int start = (int) pageable.getOffset();
+        List<UserInfoDto> userInfoPagingDtos = userInfoDtoList.subList(start, Math.min(start + pageable.getPageSize(), userInfoDtoList.size()));
+        return ResponseEntity.ok(onSuccess(_OK,userInfoPagingDtos));
+    }
+
     private void appleServiceRevoke(AppleAuthTokenResponse appleAuthToken) throws IOException {
         if (appleAuthToken.getAccessToken() != null) {
             RestTemplate restTemplate = new RestTemplateBuilder().build();

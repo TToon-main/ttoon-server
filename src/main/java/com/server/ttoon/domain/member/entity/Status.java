@@ -1,5 +1,5 @@
 package com.server.ttoon.domain.member.entity;
 
 public enum Status {
-    ACCEPT, WAITING
+    ACCEPT, WAITING, ASKING, NOTHING
 }

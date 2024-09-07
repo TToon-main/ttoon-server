@@ -21,5 +21,6 @@ public interface MemberService {
     ResponseEntity<ApiResponse<?>> deleteFriend(Long friendId);
     ResponseEntity<ApiResponse<?>> getFriends(Long memberId, Pageable pageable);
     ResponseEntity<ApiResponse<?>> getRequestFriends(Long memberId, Pageable pageable);
+    ResponseEntity<ApiResponse<?>> getSearchUsers(Long memberId, Pageable pageable,String name);
 
 }

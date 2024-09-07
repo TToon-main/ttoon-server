@@ -91,6 +91,13 @@ public class MemberController {
     @GetMapping("/friends/asks")
     public ResponseEntity<ApiResponse<?>> getRequestFriends(@PageableDefault(size = 10) Pageable pageable){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return memberService.getFriends(memberId,pageable);
+        return memberService.getRequestFriends(memberId,pageable);
+    }
+
+    @Operation(summary = "검색한 유저 조회", description = "검색어에 따라 사용자를 조회합니다.")
+    @GetMapping("/friends/search")
+    public ResponseEntity<ApiResponse<?>> getSearchUsers(@PageableDefault(size = 10) Pageable pageable, @RequestParam(name = "name") String name){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return memberService.getSearchUsers(memberId,pageable,name);
     }
 }
