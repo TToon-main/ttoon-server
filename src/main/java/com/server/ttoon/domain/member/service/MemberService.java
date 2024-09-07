@@ -20,5 +20,6 @@ public interface MemberService {
     ResponseEntity<ApiResponse<?>> acceptInvite(Long friendId);
     ResponseEntity<ApiResponse<?>> deleteFriend(Long friendId);
     ResponseEntity<ApiResponse<?>> getFriends(Long memberId, Pageable pageable);
+    ResponseEntity<ApiResponse<?>> getRequestFriends(Long memberId, Pageable pageable);
 
 }

@@ -13,12 +13,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
     private final JavaMailSender javaMailSender;
-    public ResponseEntity<ApiResponse<?>> sendEmail(AskRequestDto askRequestDto){
+
+    public ResponseEntity<ApiResponse<?>> sendEmail(AskRequestDto askRequestDto) {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setSubject("[문의사항] " + askRequestDto.getCategory());
         message.setTo("ttoon.contact@gmail.com");
-        message.setText(askRequestDto.getReceiver()+"\n"+ "\n" +askRequestDto.getBody());
+        message.setText(askRequestDto.getReceiver() + "\n" + "\n" + askRequestDto.getBody());
 
         javaMailSender.send(message);
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));

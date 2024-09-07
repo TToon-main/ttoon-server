@@ -17,5 +17,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     List<Friend> findAllByInviteeAndStatus(Member member, Status status);
 
     List<Friend> findByInvitorAndStatusOrInviteeAndStatus(Member invitor, Status status1, Member invitee, Status status2, Pageable pageable);
+    List<Friend> findByInviteeAndStatus(Member member, Status status);
 
 }
