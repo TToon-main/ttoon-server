@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface AppAuthService {
 
-    ResponseEntity<ApiResponse<?>> join(Member member);
+    ResponseEntity<ApiResponse<?>> join(Long memberId, String nickName);
 
     ResponseEntity<ApiResponse<?>> login(OAuth2LoginReqDto oAuth2LoginReqDto);
 }

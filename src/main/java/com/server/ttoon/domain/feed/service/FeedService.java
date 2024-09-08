@@ -17,6 +17,8 @@ public interface FeedService {
     ResponseEntity<ApiResponse<?>> deleteFeedCharacter(Long characterId);
     ResponseEntity<ApiResponse<?>> getFeeds(int page, int size, Boolean filter);
 
+    ResponseEntity<ApiResponse<?>> deleteFeed(Long feedId);
+
     ResponseEntity<ApiResponse<?>> addLike(Long memberId, Long feedId);
 
     ResponseEntity<ApiResponse<?>> deleteLike(Long memberId, Long feedId);

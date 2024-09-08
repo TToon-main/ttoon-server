@@ -1,6 +1,7 @@
 package com.server.ttoon.domain.feed.service;
 
 import com.amazonaws.services.secretsmanager.model.ResourceNotFoundException;
+import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.SuccessStatus;
@@ -51,6 +52,7 @@ public class FeedServiceImpl implements FeedService{
     private final FeedImageRepository feedImageRepository;
     private final MemberLikesRepository memberLikesRepository;
     private final FriendRepository friendRepository;
+    private final S3Service s3Service;
 
     @Override
     @Transactional
@@ -195,6 +197,28 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> deleteFeed(Long feedId){
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
+
+        List<MemberLikes> memberLikesList = memberLikesRepository.findAllByFeed(feed);
+
+        List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
+
+        for (FeedImage feedImage : feedImageList) {
+            s3Service.deleteImage(feedImage.getImageUrl());
+        }
+
+        memberLikesRepository.deleteAll(memberLikesList);
+        feedRepository.delete(feed);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
+    }
+
+    @Override
+    @Transactional
     public ResponseEntity<ApiResponse<?>> addLike(Long memberId, Long feedId){
 
         Feed feed = feedRepository.findById(feedId)
@@ -227,6 +251,7 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ApiResponse<?>> deleteLike(Long memberId, Long feedId) {
 
         Feed feed = feedRepository.findById(feedId)

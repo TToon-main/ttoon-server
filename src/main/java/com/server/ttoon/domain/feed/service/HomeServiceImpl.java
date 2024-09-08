@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,12 @@ public class HomeServiceImpl implements HomeService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
+        // 오늘 웹툰 생성했는지 찾기.
+        Optional<Feed> todayFeed = feedRepository.findByCreatedAtAndMember(LocalDate.now(), member);
+
+        // 오늘 생성한게 있으면 true, 없으면 false
+        boolean isCreated = todayFeed.isPresent();
+
         List<Feed> feedList = feedRepository.findAllByMemberAndCreatedAt(member.getId(), yearMonth.toString());
 
         List<FeedDto.homeFeedDto> homeFeedDtos = feedList.stream()
@@ -46,7 +53,13 @@ public class HomeServiceImpl implements HomeService{
                         .build()
                 ).toList();
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, homeFeedDtos));
+        // 오늘 웹툰 생성했는지 여부에 대한 boolean 값 추가.
+        FeedDto.finHomeFeedDto homeFeedResDto = FeedDto.finHomeFeedDto.builder()
+                .isCreated(isCreated)
+                .homeFeedDtos(homeFeedDtos)
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, homeFeedResDto));
     }
 
     @Override
