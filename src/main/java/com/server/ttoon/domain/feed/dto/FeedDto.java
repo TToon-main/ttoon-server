@@ -27,11 +27,4 @@ public class FeedDto {
         private LocalDateTime createdDate;
     }
 
-    @Data
-    @Builder
-    public static class finHomeFeedDto{
-        private boolean isCreated;
-        private List<homeFeedDto> homeFeedDtos;
-    }
-
 }
