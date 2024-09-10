@@ -4,6 +4,7 @@ import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.member.dto.request.AskRequestDto;
+import com.server.ttoon.domain.member.dto.request.NickNameRequestDto;
 import com.server.ttoon.domain.member.entity.Member;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.domain.member.service.MailService;
@@ -38,11 +39,11 @@ public class AppAuthController {
 
     @Operation(summary = "회원가입", description = "이용 약관 동의 후 회원의 권한을 USER 로 변경합니다.")
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<?>> appJoin(@RequestBody String nickName){
+    public ResponseEntity<ApiResponse<?>> appJoin(@RequestBody NickNameRequestDto nickNameRequestDto){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        return appAuthService.join(memberId, nickName);
+        return appAuthService.join(memberId, nickNameRequestDto.getNickName());
     }
 
     @Operation(summary = "서버 버전 불러오기", description = "서버의 최소 버전 불러오기", security = @SecurityRequirement(name = ""))
