@@ -128,8 +128,8 @@ public class FeedServiceImpl implements FeedService{
         // 페이지 번호, 사이즈 지정해서 Pageable 객체 생성.
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // 나만 보기 bool 값 1일때
-        if(myFilter){
+        // 나만 보기 bool 값 0일때
+        if(!myFilter){
 
             List<Member> friendList = new ArrayList<>();
 
