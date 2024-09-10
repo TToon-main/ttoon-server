@@ -32,6 +32,13 @@ public class FeedController {
         return feedService.getFeeds(page, size, onlyMine);
     }
 
+    @Operation(summary = "피드 삭제", description = "해당 피드를 삭제합니다.")
+    @DeleteMapping("/delete/{feedId}")
+    public ResponseEntity<ApiResponse<?>> deleteFeed(@PathVariable("feedId") Long feedId){
+
+        return feedService.deleteFeed(feedId);
+    }
+
     @Operation(summary = "좋아요 추가", description = "피드 좋아요를 추가합니다.")
     @PostMapping("/feeds/{feedId}")
     public ResponseEntity<ApiResponse<?>> addLike(@PathVariable("feedId") Long feedId){

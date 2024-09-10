@@ -38,12 +38,11 @@ public class AppAuthController {
 
     @Operation(summary = "회원가입", description = "이용 약관 동의 후 회원의 권한을 USER 로 변경합니다.")
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<?>> appJoin(){
+    public ResponseEntity<ApiResponse<?>> appJoin(@RequestBody String nickName){
 
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
-        return appAuthService.join(member);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        return appAuthService.join(memberId, nickName);
     }
 
     @Operation(summary = "서버 버전 불러오기", description = "서버의 최소 버전 불러오기", security = @SecurityRequirement(name = ""))

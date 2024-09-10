@@ -1,6 +1,8 @@
 package com.server.ttoon.domain.member.service;
 
+import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
+import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.security.jwt.dto.request.OAuth2LoginReqDto;
 import com.server.ttoon.domain.member.entity.Authority;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +39,20 @@ public class AppAuthServiceImpl implements AppAuthService{
 
     // 이용 약관 동의 후 회원가입 로직, 권한 ROLE_USER 로 변경
     @Transactional
-    public ResponseEntity<ApiResponse<?>> join(Member member){
+    public ResponseEntity<ApiResponse<?>> join(Long memberId, String nickName){
 
-        // 권한 ROLE_USER 로 변경
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
+
+        // 설정한 닉네임이 이미 존재하는지 찾기.
+        Optional<Member> memberExist = memberRepository.findByNickName(nickName);
+        if(memberExist.isPresent()){
+            throw new CustomRuntimeException(ErrorStatus.NICKNAME_EXIST_ERROR);
+        }
+
+        // 권한 ROLE_USER 로 변경, 닉네임 변경.
         member.changeToUser(member);
+        member.updateNickName(nickName);
         memberRepository.save(member);
 
         // authorities 추출.
