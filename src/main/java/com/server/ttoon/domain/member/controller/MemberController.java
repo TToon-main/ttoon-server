@@ -3,6 +3,7 @@ package com.server.ttoon.domain.member.controller;
 import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
+import com.server.ttoon.domain.member.dto.request.NickNameRequestDto;
 import com.server.ttoon.domain.member.service.MemberService;
 import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
 import com.server.ttoon.security.util.SecurityUtil;
@@ -63,9 +64,9 @@ public class MemberController {
 
     @Operation(summary = "친구 초대", description = "닉네임으로 친구추가를 합니다.")
     @PostMapping("/friends")
-    public ResponseEntity<ApiResponse<?>> addFriend(@RequestBody String nickName){
+    public ResponseEntity<ApiResponse<?>> addFriend(@RequestBody NickNameRequestDto nickNameRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return memberService.addFriend(memberId, nickName);
+        return memberService.addFriend(memberId, nickNameRequestDto.getNickName());
     }
 
     @Operation(summary = "친구 초대 수락", description = "친구 초대를 수락합니다.")
