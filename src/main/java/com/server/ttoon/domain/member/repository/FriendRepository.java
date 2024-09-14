@@ -17,12 +17,11 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Boolean existsByInviteeAndInvitorAndStatus(Member invitee, Member invitor, Status status);
 
     List<Friend> findAllByStatus(Status status);
-    List<Friend> findAllByInviteeAndStatus(Member member, Status status);
+    Page<Friend> findAllByInviteeAndStatus(Member member, Status status, Pageable pageable);
 
     Page<Friend> findByInvitorAndStatusOrInviteeAndStatus(Member invitor, Status status1, Member invitee, Status status2, Pageable pageable);
     List<Friend> findByInvitorAndStatusOrInviteeAndStatus(Member invitor, Status status1, Member invitee, Status status2);
 
-    List<Friend> findByInviteeAndStatus(Member member, Status status);
 
     Optional<Friend> findByInviteeAndInvitorAndStatus(Member invitee, Member invitor, Status status);
 }

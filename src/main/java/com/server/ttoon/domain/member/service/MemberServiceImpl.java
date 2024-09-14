@@ -29,7 +29,9 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -219,8 +221,10 @@ public class MemberServiceImpl implements MemberService{
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Order.asc("invitor.nickName")));
         // 내가 초대받는 자이면서 상태가 WATING인 것들 조회
-        List<Friend> friendList = friendRepository.findByInviteeAndStatus(member,Status.WAITING);
+        Page<Friend> friendList = friendRepository.findAllByInviteeAndStatus(member,Status.WAITING, pageable);
         for(Friend friend: friendList){
             // 친구 정보중에서 invitor가 친구이다.
             Long friendMemberId = friend.getInvitor().getId();
@@ -235,6 +239,7 @@ public class MemberServiceImpl implements MemberService{
                     .build();
             friendInfoDtoList.add(friendInfoDto);
         }
+        //friendInfoDtoList.sort(Comparator.comparing(FriendInfoDto::getNickName));
         return ResponseEntity.ok(onSuccess(_OK,friendInfoDtoList));
     }
     public ResponseEntity<ApiResponse<?>> getSearchUsers(Long memberId, Pageable pageable,String name){
