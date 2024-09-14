@@ -249,6 +249,8 @@ public class MemberServiceImpl implements MemberService{
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
         // 찾으려는 사용자 조회
         List<Member> users = memberRepository.findByNickNameContainingIgnoreCase(name);
+        // 그 중 현재 사용자 제외
+        users.removeIf(m -> m.getId().equals(memberId));
         for(Member user : users){
             String image = user.getImage();
             String url = s3Service.getPresignedURL(image);
@@ -319,10 +321,23 @@ public class MemberServiceImpl implements MemberService{
         // 닉네임 기준으로 사전순 정렬
         userInfoDtoList.sort(Comparator.comparing(UserInfoDto::getNickName));
 
-        //페이징 처리
-        int start = (int) pageable.getOffset();
-        List<UserInfoDto> userInfoPagingDtos = userInfoDtoList.subList(start, Math.min(start + pageable.getPageSize(), userInfoDtoList.size()));
-        return ResponseEntity.ok(onSuccess(_OK,userInfoPagingDtos));
+        int page = pageable.getPageNumber(); // 페이지 번호
+        int size = pageable.getPageSize(); // 페이지 사이즈
+
+// subList의 시작 및 끝 인덱스 계산
+        int start = page * size;
+        int end = Math.min(start + size, userInfoDtoList.size());
+
+// 시작 인덱스가 리스트 크기를 초과하는 경우 처리
+        if (start >= userInfoDtoList.size()) {
+            // 시작 인덱스가 리스트 크기를 초과하는 경우 빈 리스트를 반환하거나 적절한 응답 처리
+            return ResponseEntity.ok(onSuccess(_OK, Collections.emptyList()));
+        }
+// 현재 페이지에 해당하는 subList 생성
+        List<UserInfoDto> userInfoPagingDtos = userInfoDtoList.subList(start, end);
+
+// 페이지된 응답 반환
+        return ResponseEntity.ok(onSuccess(_OK, userInfoPagingDtos));
     }
 
     private void appleServiceRevoke(AppleAuthTokenResponse appleAuthToken) throws IOException {
