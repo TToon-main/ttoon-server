@@ -301,7 +301,7 @@ public class MemberServiceImpl implements MemberService{
                 UserInfoDto userInfoDto = UserInfoDto.builder()
                         .friendId(friend.getId())
                         .profileUrl(url)
-                        .status(Status.WAITING)
+                        .status(Status.ACCEPT)
                         .nickName(user.getNickName())
                         .build();
                 userInfoDtoList.add(userInfoDto);
@@ -312,7 +312,7 @@ public class MemberServiceImpl implements MemberService{
                 UserInfoDto userInfoDto = UserInfoDto.builder()
                         .friendId(friend.getId())
                         .profileUrl(url)
-                        .status(Status.WAITING)
+                        .status(Status.ACCEPT)
                         .nickName(user.getNickName())
                         .build();
                 userInfoDtoList.add(userInfoDto);
