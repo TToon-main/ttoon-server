@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface FeedService {
     ResponseEntity<ApiResponse<?>> addFeedCharacter(AddCharacterDto addCharacterDto);
@@ -22,4 +23,6 @@ public interface FeedService {
     ResponseEntity<ApiResponse<?>> addLike(Long memberId, Long feedId);
 
     ResponseEntity<ApiResponse<?>> deleteLike(Long memberId, Long feedId);
+
+    ResponseEntity<ApiResponse<?>> testToon(Long memberId, List<String> images, String title, String content, LocalDate date);
 }

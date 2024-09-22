@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Slice;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class FeedDto {
     private String title;
     private String content;
     private List<String> imageUrl;
-    private LocalDateTime createdDate;
+    private LocalDate createdDate;
     private int likes;
 
     @Data
@@ -24,7 +25,7 @@ public class FeedDto {
     public static class homeFeedDto{
         private Long feedId;
         private String thumbnail;
-        private LocalDateTime createdDate;
+        private LocalDate createdDate;
     }
 
 }

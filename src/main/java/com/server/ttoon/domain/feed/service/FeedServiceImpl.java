@@ -167,7 +167,7 @@ public class FeedServiceImpl implements FeedService{
                             .title(feed.getTitle())
                             .imageUrl(feed.getFeedImageList().stream()
                                     .map(FeedImage::getImageUrl).collect(Collectors.toList()))
-                            .createdDate(feed.getCreatedAt())
+                            .createdDate(feed.getDate())
                             .likes(feed.getLikes())
                             .build()
                     )
@@ -186,7 +186,7 @@ public class FeedServiceImpl implements FeedService{
                             .title(feed.getTitle())
                             .imageUrl(feed.getFeedImageList().stream()
                                     .map(FeedImage::getImageUrl).collect(Collectors.toList()))
-                            .createdDate(feed.getCreatedAt())
+                            .createdDate(feed.getDate())
                             .likes(feed.getLikes())
                             .build()
                     )
@@ -278,5 +278,40 @@ public class FeedServiceImpl implements FeedService{
         memberLikesRepository.delete(memberLikes);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLikes()));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> testToon(Long memberId, List<String> images, String title, String content, LocalDate date) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+
+        Feed feed = Feed.builder()
+                .title(title)
+                .content(content)
+                .member(member)
+                .number(1) // 필요에 따라 적절한 값 설정
+                .likes(0)
+                .date(date)
+                .build();
+
+        Feed savedFeed = feedRepository.save(feed);
+
+        List<FeedImage> feedImages = new ArrayList<>();
+        for (int i = 0; i < images.size(); i++) {
+            FeedImage feedImage = FeedImage.builder()
+                    .imageUrl(images.get(i))
+                    .feed(savedFeed)
+                    .isFirst(i == 0) // 첫 번째 이미지만 isFirst를 true로 설정
+                    .build();
+            feedImages.add(feedImage);
+        }
+
+        savedFeed.setFeedImageList(feedImages);
+        feedImageRepository.saveAll(feedImages);
+        feedRepository.save(savedFeed);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
     }
 }

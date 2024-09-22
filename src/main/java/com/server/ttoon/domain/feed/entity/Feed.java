@@ -5,6 +5,7 @@ import com.server.ttoon.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class Feed extends BaseEntity {
     private int number;
 
     private int likes;
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;

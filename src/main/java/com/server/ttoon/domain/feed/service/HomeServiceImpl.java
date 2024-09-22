@@ -43,7 +43,7 @@ public class HomeServiceImpl implements HomeService{
                 .map(feed -> FeedDto.homeFeedDto.builder()
                         .feedId(feed.getId())
                         .thumbnail(feed.getThumbnail())
-                        .createdDate(feed.getCreatedAt())
+                        .createdDate(feed.getDate())
                         .build()
                 ).toList();
 
@@ -60,7 +60,7 @@ public class HomeServiceImpl implements HomeService{
             localDate = LocalDate.now();
         }
 
-        Feed feed = feedRepository.findByCreatedAtAndMember(localDate, member)
+        Feed feed = feedRepository.findByDateAndMember(localDate, member)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.FEED_NOT_FOUND_ERROR));
 
         List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
@@ -71,7 +71,7 @@ public class HomeServiceImpl implements HomeService{
                 .imageUrl(feedImageList.stream()
                         .map(FeedImage::getImageUrl).collect(Collectors.toList())
                 )
-                .createdDate(feed.getCreatedAt())
+                .createdDate(feed.getDate())
                 .likes(feed.getLikes())
                 .build();
 

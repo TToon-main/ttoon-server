@@ -1,18 +1,25 @@
 package com.server.ttoon.domain.feed.controller;
 
+import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.feed.dto.AddCharacterDto;
 import com.server.ttoon.domain.feed.dto.CharacterDto;
 import com.server.ttoon.domain.feed.service.FeedService;
 import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Tag(name = "Feed API", description = "피드 관련 기능")
 @RestController
@@ -21,6 +28,7 @@ import java.time.LocalDateTime;
 public class FeedController {
 
     private final FeedService feedService;
+    private final S3Service s3Service;
 
     @Operation(summary = "피드 화면 조회", description = "피드 화면상의 데이터를 전달합니다.")
     @GetMapping("/feeds")
@@ -82,5 +90,26 @@ public class FeedController {
     public ResponseEntity<ApiResponse<?>> deleteFeedCharacter(@PathVariable Long characterId){
 
         return feedService.deleteFeedCharacter(characterId);
+    }
+
+    @Operation(summary = "테스트용 피드 생성", description = "테스트용 피드를 생성합니다.")
+    @PostMapping(value = "/test/toon", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<?>> testToon(@RequestPart("files") MultipartFile[] files,
+                                                   @RequestPart("title") String title,
+                                                   @RequestPart("content") String content,
+                                                   @RequestPart("date") LocalDate date) throws IOException {
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        if (files.length != 4) {
+            throw new IllegalArgumentException("Exactly 4 images are required");
+        }
+
+        List<String> images = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String image = s3Service.saveFile(file, "test");
+            images.add(image);
+        }
+        return feedService.testToon(memberId, images, title, content, date);
     }
 }
