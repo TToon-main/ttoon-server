@@ -25,6 +25,6 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     @Query("SELECT e from Feed e where e.member = :member and function('DATE', e.date) = :date")
     Optional<Feed> findByDateAndMember(@Param("date") LocalDate date, @Param("member") Member member);
 
-    @Query(value = "SELECT * FROM Feed e WHERE e.member_id = :member AND DATE_FORMAT(e.created_at, '%Y-%m') = :yearMonth", nativeQuery = true)
+    @Query(value = "SELECT * FROM Feed e WHERE e.member_id = :member AND DATE_FORMAT(e.date, '%Y-%m') = :yearMonth", nativeQuery = true)
     List<Feed> findAllByMemberAndCreatedAt(@Param("member") Long memberId, @Param("yearMonth") String yearMonth);
 }
