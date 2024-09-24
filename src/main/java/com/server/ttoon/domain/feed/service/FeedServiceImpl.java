@@ -126,7 +126,7 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         // 페이지 번호, 사이즈 지정해서 Pageable 객체 생성.
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
 
         // 나만 보기 bool 값 0일때
         if(!myFilter){
