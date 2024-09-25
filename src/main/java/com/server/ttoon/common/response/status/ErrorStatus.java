@@ -15,8 +15,8 @@ public enum ErrorStatus {
     FEED_NOT_FOUND_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_3", "피드 정보를 찾을 수 없습니다."),
     BADREQUEST_LIKE_ERROR(HttpStatus.BAD_REQUEST,"COMMON400_4", "좋아요 관련 - 잘못된 요청입니다."),
     FRIEND_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_5", "이미 친구이거나 둘 중 한명이 초대 요청을 보냈습니다."),
-    NICKNAME_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_6", "이미 존재하는 닉네임입니다.");
-
+    NICKNAME_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_6", "이미 존재하는 닉네임입니다."),
+    FEED_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_7", "이미 존재하는 닉네임입니다.");
 
 
     private final HttpStatus httpStatus;

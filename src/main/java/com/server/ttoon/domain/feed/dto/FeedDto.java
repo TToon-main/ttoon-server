@@ -28,4 +28,10 @@ public class FeedDto {
         private LocalDate createdDate;
     }
 
+    @Data
+    @Builder
+    public static class FeedIdDto{
+        private Long feedId;
+    }
+
 }

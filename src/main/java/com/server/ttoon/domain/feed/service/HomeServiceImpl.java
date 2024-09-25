@@ -1,6 +1,7 @@
 package com.server.ttoon.domain.feed.service;
 
 import com.amazonaws.services.secretsmanager.model.ResourceNotFoundException;
+import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.ErrorStatus;
@@ -32,6 +33,7 @@ public class HomeServiceImpl implements HomeService{
     private final MemberRepository memberRepository;
     private final FeedRepository feedRepository;
     private final FeedImageRepository feedImageRepository;
+    private final S3Service s3Service;
     @Override
     public ResponseEntity<ApiResponse<?>> getCalender(YearMonth yearMonth, Long memberId) {
 
@@ -46,7 +48,7 @@ public class HomeServiceImpl implements HomeService{
         List<FeedDto.homeFeedDto> homeFeedDtos = feedList.stream()
                 .map(feed -> FeedDto.homeFeedDto.builder()
                         .feedId(feed.getId())
-                        .thumbnail(feed.getThumbnail())
+                        .thumbnail(s3Service.getPresignedURL(feed.getThumbnail()))
                         .createdDate(feed.getDate())
                         .build()
                 ).toList();
@@ -71,10 +73,11 @@ public class HomeServiceImpl implements HomeService{
 
         FeedDto feedDto = FeedDto.builder()
                 .title(feed.getTitle())
+                .feedId(feed.getId())
                 .content(feed.getContent())
                 .imageUrl(feedImageList.stream()
-                        .map(FeedImage::getImageUrl).collect(Collectors.toList())
-                )
+                        .map(feedImage -> s3Service.getPresignedURL(feedImage.getImageUrl()))
+                        .collect(Collectors.toList()))
                 .createdDate(feed.getDate())
                 .likes(feed.getLikes())
                 .build();
