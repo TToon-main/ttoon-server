@@ -112,4 +112,10 @@ public class FeedController {
         }
         return feedService.testToon(memberId, images, title, content, date);
     }
+
+    @Operation(summary = "웹툰 생성", description = "웹툰을 생성합니다.")
+    @PostMapping(value = "/toon")
+    public ResponseEntity<ApiResponse<?>> createToon(){
+        return null;
+    }
 }
