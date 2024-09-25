@@ -35,7 +35,7 @@ public class HomeServiceImpl implements HomeService{
     private final FeedImageRepository feedImageRepository;
     private final S3Service s3Service;
     @Override
-    public ResponseEntity<ApiResponse<?>> getCalender(YearMonth yearMonth, Long memberId) {
+    public ResponseEntity<ApiResponse<?>> getCalendar(YearMonth yearMonth, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));

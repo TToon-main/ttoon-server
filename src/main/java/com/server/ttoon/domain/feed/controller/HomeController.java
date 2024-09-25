@@ -25,12 +25,12 @@ public class HomeController {
     private final HomeService homeService;
 
     @Operation(summary = "홈 화면 캘린더 조회", description = "연-월 을 받은 후, 그 달에 해당하는 피드를 모두 반환합니다.")
-    @GetMapping("/home/calender")
+    @GetMapping("/home/calendar")
     public ResponseEntity<ApiResponse<?>> getCalendar(@RequestParam(name = "yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        return homeService.getCalender(yearMonth, memberId);
+        return homeService.getCalendar(yearMonth, memberId);
     }
 
     @Operation(summary = "홈 화면 단일 피드 조회", description = "홈 화면 처음 접속시 혹은 홈 화면의 날짜를 클릭했을 때, 날짜에 해당하는 피드를 반환합니다.")

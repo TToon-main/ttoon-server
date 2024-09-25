@@ -11,7 +11,7 @@ import java.time.YearMonth;
 
 public interface HomeService {
 
-    ResponseEntity<ApiResponse<?>> getCalender(YearMonth yearMonth, Long memberId);
+    ResponseEntity<ApiResponse<?>> getCalendar(YearMonth yearMonth, Long memberId);
 
     ResponseEntity<ApiResponse<?>> getOneFeed(LocalDate localDate, Long memberId);
 }
