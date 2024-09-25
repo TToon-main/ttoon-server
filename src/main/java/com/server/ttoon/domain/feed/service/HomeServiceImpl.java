@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,10 @@ public class HomeServiceImpl implements HomeService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorStatus.MEMBER_NOT_FOUND_ERROR));
 
-        List<Feed> feedList = feedRepository.findAllByMemberAndCreatedAt(member.getId(), yearMonth.toString());
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        List<Feed> feedList = feedRepository.findAllByMemberAndDateBetween(member, startDate, endDate);
 
         List<FeedDto.homeFeedDto> homeFeedDtos = feedList.stream()
                 .map(feed -> FeedDto.homeFeedDto.builder()
