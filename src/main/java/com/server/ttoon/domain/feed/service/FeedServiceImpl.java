@@ -165,8 +165,9 @@ public class FeedServiceImpl implements FeedService{
                     .map(feed -> FeedDto.builder()
                             .feedId(feed.getId())
                             .title(feed.getTitle())
+                            .content(feed.getContent())
                             .imageUrl(feed.getFeedImageList().stream()
-                                    .map(FeedImage::getImageUrl).collect(Collectors.toList()))
+                                    .map(feedImage -> s3Service.getPresignedURL(feedImage.getImageUrl())).collect(Collectors.toList()))
                             .createdDate(feed.getDate())
                             .likes(feed.getLikes())
                             .build()
@@ -184,8 +185,9 @@ public class FeedServiceImpl implements FeedService{
                     .map(feed -> FeedDto.builder()
                             .feedId(feed.getId())
                             .title(feed.getTitle())
+                            .content(feed.getContent())
                             .imageUrl(feed.getFeedImageList().stream()
-                                    .map(FeedImage::getImageUrl).collect(Collectors.toList()))
+                                    .map(feedImage -> s3Service.getPresignedURL(feedImage.getImageUrl())).collect(Collectors.toList()))
                             .createdDate(feed.getDate())
                             .likes(feed.getLikes())
                             .build()
@@ -287,6 +289,8 @@ public class FeedServiceImpl implements FeedService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
+        if(feedRepository.existsByMemberAndDate(member, date))
+            throw new CustomRuntimeException(FEED_EXIST_ERROR);
         Feed feed = Feed.builder()
                 .title(title)
                 .content(content)
@@ -312,6 +316,7 @@ public class FeedServiceImpl implements FeedService{
         feedImageRepository.saveAll(feedImages);
         feedRepository.save(savedFeed);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
+        FeedDto.FeedIdDto feedIdDto = FeedDto.FeedIdDto.builder().feedId(savedFeed.getId()).build();
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedIdDto));
     }
 }

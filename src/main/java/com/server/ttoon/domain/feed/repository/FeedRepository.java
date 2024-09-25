@@ -26,4 +26,6 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     Optional<Feed> findByDateAndMember(@Param("date") LocalDate date, @Param("member") Member member);
 
     List<Feed> findAllByMemberAndDateBetween(Member member, LocalDate date, LocalDate date2);
+
+    Boolean existsByMemberAndDate(Member member, LocalDate date);
 }
