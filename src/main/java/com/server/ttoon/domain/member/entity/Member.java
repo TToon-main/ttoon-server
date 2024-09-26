@@ -1,11 +1,15 @@
 package com.server.ttoon.domain.member.entity;
 
 import com.server.ttoon.common.BaseEntity;
+import com.server.ttoon.domain.attendance.entity.Attendance;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,5 +46,11 @@ public class Member extends BaseEntity {
     public void updateImage(String image){
         this.image = image;
     }
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Attendance> attendanceList = new ArrayList<>();
 
+    public void addAttendance(Attendance attendance) {
+        this.attendanceList.add(attendance);
+        attendance.setMember(this);  // 양방향 관계 설정
+    }
 }
