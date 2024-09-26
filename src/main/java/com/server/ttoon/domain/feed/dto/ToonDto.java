@@ -31,4 +31,11 @@ public class ToonDto {
         private List<String> imageUrls;
     }
 
+    @Data
+    @Builder
+    public static class toonResponseDto{
+        private Long feedId;
+        private List<String> imageUrls;
+    }
+
 }

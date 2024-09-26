@@ -365,7 +365,13 @@ public class FeedServiceImpl implements FeedService{
 
         List<String> imageUrls = Objects.requireNonNull(monoImageResponseDto.block()).getImageUrls();
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, imageUrls));
+        ToonDto.toonResponseDto toonResponseDto = ToonDto.toonResponseDto.builder()
+                .feedId(feed.getId())
+                .imageUrls(imageUrls)
+                .build();
+
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, toonResponseDto));
     }
 //    나중에 ai 변경 됐을 때, 연결 테스트용
 //    @Override
