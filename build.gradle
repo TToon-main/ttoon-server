@@ -69,6 +69,14 @@ dependencies {
     implementation 'org.glassfish.jaxb:jaxb-core:3.0.2'
     implementation 'org.glassfish.jaxb:txw2:3.0.2'
     implementation 'com.sun.activation:jakarta.activation:1.2.2'
+
+    // WebClient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Netty
+    // https://mvnrepository.com/artifact/io.netty/netty-resolver-dns-native-macos
+    runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.113.Final'
+
 }
 
 tasks.named('test') {

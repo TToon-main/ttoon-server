@@ -4,6 +4,7 @@ import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.feed.dto.AddCharacterDto;
 import com.server.ttoon.domain.feed.dto.CharacterDto;
+import com.server.ttoon.domain.feed.dto.ToonDto;
 import com.server.ttoon.domain.feed.service.FeedService;
 import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -112,10 +113,31 @@ public class FeedController {
         }
         return feedService.testToon(memberId, images, title, content, date);
     }
+//    에러 생기거나, 나중에 ai 테스트 할때 사용할 테스트용 api.
+//    @Operation(summary = "기록 추가(웹툰 생성) 테스트용1233445", description = "테스트용~!~!@~!@~!@~!ㄸ#@!#$%$#@!~")
+//    @PostMapping(value = "/toon/test")
+//    public ResponseEntity<ApiResponse<?>> createToonTest(@RequestBody ToonDto toonDto){
+//
+//        return feedService.createToonTest(toonDto);
+//    }
 
-    @Operation(summary = "웹툰 생성", description = "웹툰을 생성합니다.")
+    @Operation(summary = "기록 추가(웹툰 생성)", description = "기록 추가 화면에서 완료 버튼 클릭 시, 요청하는 API.")
     @PostMapping(value = "/toon")
-    public ResponseEntity<ApiResponse<?>> createToon(){
-        return null;
+    public ResponseEntity<ApiResponse<?>> createToon(@RequestBody ToonDto toonDto){
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        return feedService.createToon(memberId, toonDto);
     }
+
+    @Operation(summary = "기록 추가(이미지 선택 완료)", description = "사용자가 4개의 컷 모두 선택 완료했을 때 요청하는 API.")
+    @PostMapping(value = "/toon/complete/{feedId}")
+    public ResponseEntity<ApiResponse<?>> completeToon(@PathVariable Long feedId,
+                                                       @RequestBody ToonDto.imageDto imageDto
+    ){
+
+        return feedService.completeToon(feedId, imageDto);
+    }
+
+
 }

@@ -1,0 +1,34 @@
+package com.server.ttoon.domain.feed.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+public class ToonDto {
+    private String style;
+    private Long mainCharacterId;
+    private String others;
+    private int number;
+    private String title;
+    private String content;
+
+    @Data
+    @Builder
+    public static class sendDto{
+        private String text;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class imageDto{
+        private List<String> imageUrls;
+    }
+
+}

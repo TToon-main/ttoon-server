@@ -5,9 +5,7 @@ import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.SuccessStatus;
-import com.server.ttoon.domain.feed.dto.AddCharacterDto;
-import com.server.ttoon.domain.feed.dto.CharacterDto;
-import com.server.ttoon.domain.feed.dto.FeedDto;
+import com.server.ttoon.domain.feed.dto.*;
 import com.server.ttoon.domain.feed.entity.Figure;
 import com.server.ttoon.domain.feed.entity.Feed;
 import com.server.ttoon.domain.feed.entity.FeedImage;
@@ -23,19 +21,25 @@ import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,6 +57,7 @@ public class FeedServiceImpl implements FeedService{
     private final MemberLikesRepository memberLikesRepository;
     private final FriendRepository friendRepository;
     private final S3Service s3Service;
+    private final WebClient webClient;
 
     @Override
     @Transactional
@@ -319,4 +324,104 @@ public class FeedServiceImpl implements FeedService{
         FeedDto.FeedIdDto feedIdDto = FeedDto.FeedIdDto.builder().feedId(savedFeed.getId()).build();
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedIdDto));
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto){
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+
+        if(feedRepository.existsByMemberAndDate(member, LocalDate.now()))
+            throw new CustomRuntimeException(FEED_EXIST_ERROR);
+
+        Feed feed = Feed.builder()
+                .title(toonDto.getTitle())
+                .content(toonDto.getContent())
+                .member(member)
+                .number(toonDto.getNumber()) // 필요에 따라 적절한 값 설정
+                .likes(0)
+                .date(LocalDate.now())
+                .build();
+
+        feedRepository.save(feed);
+
+        Figure figure = figureRepository.findById(toonDto.getMainCharacterId())
+                .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
+
+        ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
+                .text("주인공: (" + figure.getName() + ": " + figure.getInfo() + ")\n" +
+                        "(" + toonDto.getOthers() + ")\n" +
+                        "이야기: " + toonDto.getContent())
+                .build();
+
+        System.out.println(sendDto);
+
+        Mono<ImageResponseDto> monoImageResponseDto = webClient.post()
+                .uri("/get_images")
+                .bodyValue(sendDto)
+                .retrieve()
+                .bodyToMono(ImageResponseDto.class);
+
+        List<String> imageUrls = Objects.requireNonNull(monoImageResponseDto.block()).getImageUrls();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, imageUrls));
+    }
+//    나중에 ai 변경 됐을 때, 연결 테스트용
+//    @Override
+//    public ResponseEntity<ApiResponse<?>> createToonTest(ToonDto toonDto) {
+//
+//        Figure figure = figureRepository.findById(toonDto.getMainCharacterId())
+//                .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
+//
+//        ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
+//                .text("주인공: (" + figure.getName() + ": " + figure.getInfo() + ")\n" +
+//                        "(" + toonDto.getOthers() + ")\n" +
+//                        "이야기: " + toonDto.getContent())
+//                .build();
+//
+//        System.out.println(sendDto);
+//
+//        ImageResponseDto imageResponseDto = webClient.post()
+//                .uri("/get_images")
+//                .bodyValue(sendDto)
+//                .retrieve()
+//                .bodyToMono(ImageResponseDto.class)
+//                .block();
+//
+//
+//        if(imageResponseDto == null){
+//            throw new CustomRuntimeException(BADREQUEST_ERROR);
+//        }
+//
+//        List<String> imageUrls = imageResponseDto.getImageUrls();
+//
+//        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, imageUrls));
+//    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto) {
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
+
+        List<FeedImage> feedImages = new ArrayList<>();
+        for (int i = 0; i < imageDto.getImageUrls().size(); i++) {
+            FeedImage feedImage = FeedImage.builder()
+                    .imageUrl(imageDto.getImageUrls().get(i))
+                    .feed(feed)
+                    .isFirst(i == 0) // 첫 번째 이미지만 isFirst를 true로 설정
+                    .build();
+            feedImages.add(feedImage);
+        }
+
+        feed.setFeedImageList(feedImages);
+        feedImageRepository.saveAll(feedImages);
+        feedRepository.save(feed);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
+    }
+
+
 }

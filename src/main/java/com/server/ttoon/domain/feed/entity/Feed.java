@@ -4,6 +4,7 @@ import com.server.ttoon.common.BaseEntity;
 import com.server.ttoon.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +23,10 @@ public class Feed extends BaseEntity {
 
     private String title;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
+
     private int number;
 
     private int likes;
