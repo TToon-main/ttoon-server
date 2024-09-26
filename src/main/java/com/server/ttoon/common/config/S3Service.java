@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
@@ -29,6 +30,12 @@ public class S3Service {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    // S3 URL에서 Key 추출
+    public String getS3KeyFromUrl(String s3Url) throws Exception{
+        URI uri = new URI(s3Url);
+        return uri.getPath().substring(1);  // '/' 제거 후 경로 반환
+    }
 
     /*
      * 업로드 할 파일을 S3 버킷에 담고 Url(파일 경로) 받아 오는 메소드.

@@ -407,7 +407,7 @@ public class FeedServiceImpl implements FeedService{
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto) {
+    public ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto) throws Exception {
 
         Feed feed = feedRepository.findById(feedId)
                 .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
@@ -415,7 +415,7 @@ public class FeedServiceImpl implements FeedService{
         List<FeedImage> feedImages = new ArrayList<>();
         for (int i = 0; i < imageDto.getImageUrls().size(); i++) {
             FeedImage feedImage = FeedImage.builder()
-                    .imageUrl(imageDto.getImageUrls().get(i))
+                    .imageUrl(s3Service.getS3KeyFromUrl(imageDto.getImageUrls().get(i))) // 이미지의 S3 키값을 저장.
                     .feed(feed)
                     .isFirst(i == 0) // 첫 번째 이미지만 isFirst를 true로 설정
                     .build();

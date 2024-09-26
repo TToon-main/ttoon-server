@@ -31,5 +31,5 @@ public interface FeedService {
 
     //ResponseEntity<ApiResponse<?>> createToonTest(ToonDto toonDto);
 
-    ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto);
+    ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto) throws Exception;
 }
