@@ -134,7 +134,7 @@ public class FeedController {
     @PostMapping(value = "/toon/complete/{feedId}")
     public ResponseEntity<ApiResponse<?>> completeToon(@PathVariable Long feedId,
                                                        @RequestBody ToonDto.imageDto imageDto
-    ){
+    ) throws Exception {
 
         return feedService.completeToon(feedId, imageDto);
     }
