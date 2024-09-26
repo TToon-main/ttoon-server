@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
-//@OpenAPIDefinition(servers = {@Server(url = "https://ttoon.site", description = "Default Server url")})
+@OpenAPIDefinition(servers = {@Server(url = "https://ttoon.site", description = "Default Server url")})
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableScheduling
 public class TToonApplication {
 
     public static void main(String[] args) {

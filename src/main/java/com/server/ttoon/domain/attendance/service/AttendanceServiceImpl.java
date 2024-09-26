@@ -12,6 +12,7 @@ import com.server.ttoon.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,20 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     private final MemberRepository memberRepository;
     private final AttendanceRepository attendanceRepository;
+
+    @Scheduled(cron = "0 0 0 * * SUN")
+    @Transactional
+    public void clearAttendanceTable() {
+        List<Attendance> attendances = attendanceRepository.findAll();
+
+        for (Attendance attendance : attendances) {
+            Member member = attendance.getMember();
+            if (member != null) {
+                member.getAttendanceList().remove(attendance);
+            }
+        }
+        attendanceRepository.deleteAll();
+    }
 
     @Override
     @Transactional
