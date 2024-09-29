@@ -1,5 +1,6 @@
 package com.server.ttoon.domain.feed.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.feed.dto.AddCharacterDto;
 import com.server.ttoon.domain.feed.dto.CharacterDto;
@@ -27,7 +28,7 @@ public interface FeedService {
 
     ResponseEntity<ApiResponse<?>> testToon(Long memberId, List<String> images, String title, String content, LocalDate date);
 
-    ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto);
+    ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) throws JsonProcessingException;
 
     //ResponseEntity<ApiResponse<?>> createToonTest(ToonDto toonDto);
 

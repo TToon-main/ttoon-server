@@ -1,6 +1,8 @@
 package com.server.ttoon.domain.feed.service;
 
 import com.amazonaws.services.secretsmanager.model.ResourceNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
@@ -327,7 +329,7 @@ public class FeedServiceImpl implements FeedService{
 
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto){
+    public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) throws JsonProcessingException {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
@@ -350,12 +352,14 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
 
         ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
-                .text("주인공: (" + figure.getName() + ": " + figure.getInfo() + ")\n" +
-                        "(" + toonDto.getOthers() + ")\n" +
-                        "이야기: " + toonDto.getContent())
+                .text("주인공:(" + figure.getName() + ": " + figure.getInfo() + ")\n등장인물:("
+                        + toonDto.getOthers() + ")\n이야기:" + toonDto.getContent())
                 .build();
 
-        System.out.println(sendDto);
+          // json 데이터 확인용 코드.
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String jsonData = objectMapper.writeValueAsString(sendDto);
+//        System.out.println(jsonData);
 
         Mono<ImageResponseDto> monoImageResponseDto = webClient.post()
                 .uri("/get_images")

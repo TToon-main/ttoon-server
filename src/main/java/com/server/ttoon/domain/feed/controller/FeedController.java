@@ -1,5 +1,6 @@
 package com.server.ttoon.domain.feed.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.domain.feed.dto.AddCharacterDto;
@@ -123,7 +124,7 @@ public class FeedController {
 
     @Operation(summary = "기록 추가(웹툰 생성)", description = "기록 추가 화면에서 완료 버튼 클릭 시, 요청하는 API.")
     @PostMapping(value = "/toon")
-    public ResponseEntity<ApiResponse<?>> createToon(@RequestBody ToonDto toonDto){
+    public ResponseEntity<ApiResponse<?>> createToon(@RequestBody ToonDto toonDto) throws JsonProcessingException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
