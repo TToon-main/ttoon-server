@@ -62,7 +62,9 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .build();
 
         member.addAttendance(attendance);
+        member.addPoint();
         attendanceRepository.save(attendance);
+        memberRepository.save(member);
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
     }
 

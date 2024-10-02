@@ -53,4 +53,7 @@ public class Member extends BaseEntity {
         this.attendanceList.add(attendance);
         attendance.setMember(this);  // 양방향 관계 설정
     }
+    public void addPoint(){
+        this.point += 100;
+    }
 }
