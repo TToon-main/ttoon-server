@@ -75,10 +75,11 @@ public class FeedServiceImpl implements FeedService{
                 .member(member)
                 .build();
 
-        figureRepository.save(figure);
+        Figure newFigure = figureRepository.save(figure);
+        FigureIdDto figureIdDto = FigureIdDto.builder().figureId(newFigure.getId()).build();
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.onSuccess(SuccessStatus._CREATED));
+                .body(ApiResponse.onSuccess(SuccessStatus._CREATED,figureIdDto));
     }
 
     @Override
@@ -89,8 +90,10 @@ public class FeedServiceImpl implements FeedService{
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
         figure.updateCharacter(characterDto.getName(), characterDto.getInfo());
+        Figure changedFigure = figureRepository.save(figure);
+        FigureIdDto figureIdDto = FigureIdDto.builder().figureId(changedFigure.getId()).build();
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK,figureIdDto));
     }
 
     @Override
