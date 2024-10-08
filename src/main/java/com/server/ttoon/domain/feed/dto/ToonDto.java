@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 @Builder
 public class ToonDto {
-    private String style;
     private Long mainCharacterId;
     private List<Long> others;
     private int number;
