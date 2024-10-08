@@ -14,11 +14,16 @@ import java.util.List;
 public class FeedDto {
 
     private Long feedId;
+    private String writerName;
+    private String writerImage;
     private String title;
     private String content;
     private List<String> imageUrl;
     private LocalDate createdDate;
     private int likes;
+    private Boolean isMine;
+    private Boolean likeOrNot;
+
 
     @Data
     @Builder

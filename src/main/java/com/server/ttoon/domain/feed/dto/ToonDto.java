@@ -12,7 +12,7 @@ import java.util.List;
 public class ToonDto {
     private String style;
     private Long mainCharacterId;
-    private String others;
+    private List<Long> others;
     private int number;
     private String title;
     private String content;
