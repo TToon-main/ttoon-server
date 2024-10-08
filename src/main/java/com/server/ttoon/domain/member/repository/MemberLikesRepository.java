@@ -14,4 +14,6 @@ public interface MemberLikesRepository extends JpaRepository<MemberLikes, Long> 
 
     List<MemberLikes> findAllByFeed(Feed feed);
 
+    Boolean existsByMemberAndFeed(Member member, Feed feed);
+
 }

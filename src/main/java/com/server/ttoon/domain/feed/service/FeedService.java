@@ -26,6 +26,8 @@ public interface FeedService {
 
     ResponseEntity<ApiResponse<?>> deleteLike(Long memberId, Long feedId);
 
+    ResponseEntity<ApiResponse<?>> getLikeList(Long memberId, Long feedId);
+
     ResponseEntity<ApiResponse<?>> testToon(Long memberId, List<String> images, String title, String content, LocalDate date);
 
     ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) throws JsonProcessingException;

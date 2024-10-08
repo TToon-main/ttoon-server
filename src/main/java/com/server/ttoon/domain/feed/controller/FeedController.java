@@ -50,7 +50,7 @@ public class FeedController {
     }
 
     @Operation(summary = "좋아요 추가", description = "피드 좋아요를 추가합니다.")
-    @PostMapping("/feeds/{feedId}")
+    @PostMapping("/likes/{feedId}")
     public ResponseEntity<ApiResponse<?>> addLike(@PathVariable("feedId") Long feedId){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
@@ -58,12 +58,21 @@ public class FeedController {
         return feedService.addLike(memberId, feedId);
     }
     @Operation(summary = "좋아요 취소", description = "피드 좋아요를 취소합니다.")
-    @DeleteMapping("/feeds/{feedId}")
+    @DeleteMapping("/likes/{feedId}")
     public ResponseEntity<ApiResponse<?>> deleteLike(@PathVariable("feedId") Long feedId){
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
         return feedService.deleteLike(memberId, feedId);
+    }
+
+    @Operation(summary = "좋아요 누른 사람들 리스트", description = "좋아요 누른 사람들 리스트를 조회합니다.")
+    @GetMapping("/likes/{feedId}")
+    public ResponseEntity<ApiResponse<?>> getLikeList(@PathVariable("feedId") Long feedId){
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        return feedService.getLikeList(memberId, feedId);
     }
 
     @Operation(summary = "등장인물 추가", description = "사용자의 기록 속 새로운 등장인물을 추가합니다.")
@@ -114,7 +123,8 @@ public class FeedController {
         }
         return feedService.testToon(memberId, images, title, content, date);
     }
-//    에러 생기거나, 나중에 ai 테스트 할때 사용할 테스트용 api.
+
+    //에러 생기거나, 나중에 ai 테스트 할때 사용할 테스트용 api.
 //    @Operation(summary = "기록 추가(웹툰 생성) 테스트용1233445", description = "테스트용~!~!@~!@~!@~!ㄸ#@!#$%$#@!~")
 //    @PostMapping(value = "/toon/test")
 //    public ResponseEntity<ApiResponse<?>> createToonTest(@RequestBody ToonDto toonDto){

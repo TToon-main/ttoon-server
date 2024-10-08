@@ -168,25 +168,29 @@ public class FeedServiceImpl implements FeedService{
                 friendList.add(friendMember);
             }
 
-            Slice<Feed> feedSlice = feedRepository.findAllByMemberAndFriends(member, friendList, pageable);
+            Slice<Feed> feedSlice = feedRepository.findAllByMemberOrFriends(member, friendList, pageable);
 
             // feedSlice 를 DTO 타입 리스트로 변환하기
             List<FeedDto> feedDtoList = feedSlice.stream()
                     .map(feed -> FeedDto.builder()
                             .feedId(feed.getId())
+                            .writerName(feed.getMember().getNickName())
+                            .writerImage(s3Service.getPresignedURL(feed.getMember().getImage()))
                             .title(feed.getTitle())
                             .content(feed.getContent())
                             .imageUrl(feed.getFeedImageList().stream()
                                     .map(feedImage -> s3Service.getPresignedURL(feedImage.getImageUrl())).collect(Collectors.toList()))
                             .createdDate(feed.getDate())
                             .likes(feed.getLikes())
+                            .isMine(feed.getMember().equals(member))
+                            .likeOrNot(memberLikesRepository.existsByMemberAndFeed(member, feed))
                             .build()
                     )
                     .toList();
 
             return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedDtoList));
         }
-        else{ // 나만 보기 bool 값 0일 때
+        else{ // 나만 보기 bool 값 1일 때 -> 내 피드만 보고 싶을 때
 
             Slice<Feed> feedSlice = feedRepository.findAllByMember(member, pageable);
 
@@ -194,12 +198,16 @@ public class FeedServiceImpl implements FeedService{
             List<FeedDto> feedDtoList = feedSlice.stream()
                     .map(feed -> FeedDto.builder()
                             .feedId(feed.getId())
+                            .writerName(feed.getMember().getNickName())
+                            .writerImage(s3Service.getPresignedURL(feed.getMember().getImage()))
                             .title(feed.getTitle())
                             .content(feed.getContent())
                             .imageUrl(feed.getFeedImageList().stream()
                                     .map(feedImage -> s3Service.getPresignedURL(feedImage.getImageUrl())).collect(Collectors.toList()))
                             .createdDate(feed.getDate())
                             .likes(feed.getLikes())
+                            .isMine(feed.getMember().equals(member))
+                            .likeOrNot(memberLikesRepository.existsByMemberAndFeed(member, feed))
                             .build()
                     )
                     .toList();
@@ -293,6 +301,24 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
+    public ResponseEntity<ApiResponse<?>> getLikeList(Long memberId, Long feedId) {
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new CustomRuntimeException(FEED_NOT_FOUND_ERROR));
+
+        List<MemberLikes> memberLikesList = memberLikesRepository.findAllByFeed(feed);
+
+        List<MemberLikeDto> memberLikeDtos = memberLikesList.stream()
+                .map(memberLikes -> MemberLikeDto.builder()
+                        .userName(memberLikes.getMember().getNickName())
+                        .userImage(s3Service.getPresignedURL(memberLikes.getMember().getImage()))
+                        .build()
+                ).toList();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, memberLikeDtos));
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<ApiResponse<?>> testToon(Long memberId, List<String> images, String title, String content, LocalDate date) {
 
@@ -354,9 +380,23 @@ public class FeedServiceImpl implements FeedService{
         Figure figure = figureRepository.findById(toonDto.getMainCharacterId())
                 .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
 
+        List<Figure> figures = figureRepository.findAllById(toonDto.getOthers());
+
+        String textData = "(주인공: " + figure.getName() + ": " + figure.getInfo() + ")\n(등장인물: ";
+
+        // 등장인물 정보 붙이기
+        for(int i = 0; i < figures.size(); i++){
+            textData += "(" + figures.get(i).getName() + ": " + figures.get(i).getInfo() + ")";
+            if(i == figures.size() - 1){
+                break;
+            }
+            textData += ", ";
+        }
+
+        textData += ")\n(이야기: " + toonDto.getContent() + ")";
+
         ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
-                .text("주인공:(" + figure.getName() + ": " + figure.getInfo() + ")\n등장인물:("
-                        + toonDto.getOthers() + ")\n이야기:" + toonDto.getContent())
+                .text(textData)
                 .build();
 
           // json 데이터 확인용 코드.
@@ -387,10 +427,23 @@ public class FeedServiceImpl implements FeedService{
 //        Figure figure = figureRepository.findById(toonDto.getMainCharacterId())
 //                .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
 //
+//        List<Figure> figures = figureRepository.findAllById(toonDto.getOthers());
+//
+//        String textData = "(주인공: " + figure.getName() + ": " + figure.getInfo() + ")\n(등장인물: ";
+//
+//        // 등장인물 정보 붙이기
+//        for(int i = 0; i < figures.size(); i++){
+//            textData += "(" + figures.get(i).getName() + ": " + figures.get(i).getInfo() + ")";
+//            if(i == figures.size() - 1){
+//                break;
+//            }
+//            textData += ", ";
+//        }
+//
+//        textData += ")\n(이야기: " + toonDto.getContent() + ")";
+//
 //        ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
-//                .text("주인공: (" + figure.getName() + ": " + figure.getInfo() + ")\n" +
-//                        "(" + toonDto.getOthers() + ")\n" +
-//                        "이야기: " + toonDto.getContent())
+//                .text(textData)
 //                .build();
 //
 //        System.out.println(sendDto);

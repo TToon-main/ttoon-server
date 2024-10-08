@@ -20,7 +20,7 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
     Slice<Feed> findAllByMember(Member member, Pageable pageable);
 
     @Query("SELECT e from Feed e where e.member = :member OR e.member IN :friends")
-    Slice<Feed> findAllByMemberAndFriends(@Param("member") Member member, @Param("friends") List<Member> friends, Pageable pageable);
+    Slice<Feed> findAllByMemberOrFriends(@Param("member") Member member, @Param("friends") List<Member> friends, Pageable pageable);
 
     @Query("SELECT e from Feed e where e.member = :member and function('DATE', e.date) = :date")
     Optional<Feed> findByDateAndMember(@Param("date") LocalDate date, @Param("member") Member member);
