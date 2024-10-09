@@ -371,8 +371,9 @@ public class FeedServiceImpl implements FeedService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
-        if(feedRepository.existsByMemberAndDate(member, LocalDate.now()))
-            throw new CustomRuntimeException(FEED_EXIST_ERROR);
+        // 임시로 피드 하루 제한 없앰.
+//        if(feedRepository.existsByMemberAndDate(member, LocalDate.now()))
+//            throw new CustomRuntimeException(FEED_EXIST_ERROR);
 
         Feed feed = Feed.builder()
                 .title(toonDto.getTitle())
