@@ -267,7 +267,11 @@ public class FeedServiceImpl implements FeedService{
 
         memberLikesRepository.save(memberLikes);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLikes()));
+        MemberLikeDto.LikeDto likeDto = MemberLikeDto.LikeDto.builder()
+                .like(feed.getLikes())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, likeDto));
     }
 
     @Override
@@ -297,7 +301,11 @@ public class FeedServiceImpl implements FeedService{
 
         memberLikesRepository.delete(memberLikes);
 
-        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feed.getLikes()));
+        MemberLikeDto.LikeDto likeDto = MemberLikeDto.LikeDto.builder()
+                .like(feed.getLikes())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, likeDto));
     }
 
     @Override

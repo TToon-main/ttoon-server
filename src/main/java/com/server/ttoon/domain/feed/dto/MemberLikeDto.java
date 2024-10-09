@@ -9,4 +9,10 @@ public class MemberLikeDto {
 
     private String userName;
     private String userImage;
+
+    @Data
+    @Builder
+    public static class LikeDto{
+        private int like;
+    }
 }
