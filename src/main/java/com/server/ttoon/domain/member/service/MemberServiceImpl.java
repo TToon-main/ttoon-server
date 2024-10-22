@@ -81,6 +81,7 @@ public class MemberServiceImpl implements MemberService{
                 .nickName(member.getNickName())
                 .email(member.getEmail())
                 .imageUrl(url)
+                .point(member.getPoint())
                 .provider(member.getProvider())
                 .build();
 
