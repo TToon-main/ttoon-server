@@ -32,7 +32,7 @@ public interface FeedService {
 
     ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) throws JsonProcessingException;
 
-    //ResponseEntity<ApiResponse<?>> createToonTest(ToonDto toonDto);
+    //ResponseEntity<ApiResponse<?>> createToonTest(Long memberId, ToonDto toonDto);
 
     ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto) throws Exception;
 }

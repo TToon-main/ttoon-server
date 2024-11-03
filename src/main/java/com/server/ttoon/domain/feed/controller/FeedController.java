@@ -129,7 +129,9 @@ public class FeedController {
 //    @PostMapping(value = "/toon/test")
 //    public ResponseEntity<ApiResponse<?>> createToonTest(@RequestBody ToonDto toonDto){
 //
-//        return feedService.createToonTest(toonDto);
+//        Long memberId = SecurityUtil.getCurrentMemberId();
+//
+//        return feedService.createToonTest(memberId, toonDto);
 //    }
 
     @Operation(summary = "기록 추가(웹툰 생성)", description = "기록 추가 화면에서 완료 버튼 클릭 시, 요청하는 API.")

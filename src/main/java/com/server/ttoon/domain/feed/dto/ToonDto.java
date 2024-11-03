@@ -14,7 +14,7 @@ public class ToonDto {
     private List<Long> others;
     private int number;
     private String title;
-    private String content;
+    private List<String> contentList;
 
     @Data
     @Builder
