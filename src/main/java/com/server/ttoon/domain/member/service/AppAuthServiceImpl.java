@@ -158,7 +158,7 @@ public class AppAuthServiceImpl implements AppAuthService{
         OAuth2LoginResDto oAuth2LoginResDto = OAuth2LoginResDto.builder()
                 .accessToken(tokenDto.getAccessToken())
                 .refreshToken(tokenDto.getRefreshToken())
-                .isGuest(false)
+                .isGuest(member.getAuthority() != Authority.ROLE_USER)
                 .build();
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, oAuth2LoginResDto));
     }
