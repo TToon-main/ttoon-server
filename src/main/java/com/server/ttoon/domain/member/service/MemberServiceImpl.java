@@ -130,9 +130,6 @@ public class MemberServiceImpl implements MemberService{
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(memberId.toString()).orElse(null);
 
-        if(appleIdentityTokenDto.isEmpty())
-            throw new CustomRuntimeException(BADREQUEST_ERROR);
-
         RevokeReason revokeReason = RevokeReason.builder()
                 .userName(member.getNickName())
                 .reason(appleIdentityTokenDto.get().getRevokeReason())
