@@ -137,7 +137,7 @@ public class MemberServiceImpl implements MemberService{
 
         revokeReasonRepository.save(revokeReason);
 
-        if(member.getProvider().equals(Provider.APPLE.toString()) && sender.equals("app"))
+        if(member.getProvider().toString().equals(Provider.APPLE.toString()) && sender.equals("app"))
         {
             if(appleIdentityTokenDto.get().getAuthorizationCode().isEmpty())
                 throw new CustomRuntimeException(BADREQUEST_ERROR);
