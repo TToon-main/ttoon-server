@@ -124,23 +124,13 @@ public class FeedController {
         return feedService.testToon(memberId, images, title, content, date);
     }
 
-    //에러 생기거나, 나중에 ai 테스트 할때 사용할 테스트용 api.
-//    @Operation(summary = "기록 추가(웹툰 생성) 테스트용1233445", description = "테스트용~!~!@~!@~!@~!ㄸ#@!#$%$#@!~")
-//    @PostMapping(value = "/toon/test")
-//    public ResponseEntity<ApiResponse<?>> createToonTest(@RequestBody ToonDto toonDto){
-//
-//        Long memberId = SecurityUtil.getCurrentMemberId();
-//
-//        return feedService.createToonTest(memberId, toonDto);
-//    }
-
     @Operation(summary = "기록 추가(웹툰 생성)", description = "기록 추가 화면에서 완료 버튼 클릭 시, 요청하는 API.")
     @PostMapping(value = "/toon")
     public ResponseEntity<ApiResponse<?>> createToon(@RequestBody ToonDto toonDto) throws JsonProcessingException {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        return feedService.createToon(memberId, toonDto);
+        return null;
     }
 
     @Operation(summary = "기록 추가(이미지 선택 완료)", description = "사용자가 4개의 컷 모두 선택 완료했을 때 요청하는 API.")
