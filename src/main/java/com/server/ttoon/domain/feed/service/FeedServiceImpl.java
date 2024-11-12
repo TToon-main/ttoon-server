@@ -1,12 +1,9 @@
 package com.server.ttoon.domain.feed.service;
 
 import com.amazonaws.services.secretsmanager.model.ResourceNotFoundException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.ttoon.common.config.S3Service;
 import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
-import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.feed.dto.*;
 import com.server.ttoon.domain.feed.entity.Figure;
@@ -24,27 +21,21 @@ import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.server.ttoon.common.response.status.ErrorStatus.*;
@@ -68,6 +59,13 @@ public class FeedServiceImpl implements FeedService{
                 .uri("/get_images")
                 .bodyValue(sendDto)
                 .retrieve()
+                .onStatus(
+                        httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
+                        clientResponse -> {
+                            return clientResponse.bodyToMono(String.class)
+                                    .flatMap(errorBody -> Mono.error(new CustomRuntimeException(AI_BAD_REQUEST_ERROR)));
+                        }
+                )
                 .bodyToMono(ImageResponseDto.class);
     }
 
@@ -374,9 +372,11 @@ public class FeedServiceImpl implements FeedService{
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, feedIdDto));
     }
 
+
+
     @Override
     @Transactional
-    public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) throws JsonProcessingException {
+    public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
@@ -445,76 +445,6 @@ public class FeedServiceImpl implements FeedService{
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, toonResponseDto));
     }
-
-    //나중에 ai 변경 됐을 때, 연결 테스트용
-//    @Override
-//    @Transactional
-//    public ResponseEntity<ApiResponse<?>> createToonTest(Long memberId, ToonDto toonDto) {
-//
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
-//
-//        Figure figure = figureRepository.findById(toonDto.getMainCharacterId())
-//                .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
-//
-//        List<Figure> figures = figureRepository.findAllById(toonDto.getOthers());
-//
-//        String content = String.join(" ", toonDto.getContentList());
-//
-//        Feed feed = Feed.builder()
-//                .title(toonDto.getTitle())
-//                .content(content)
-//                .member(member)
-//                .number(toonDto.getNumber()) // 필요에 따라 적절한 값 설정
-//                .likes(0)
-//                .date(LocalDate.now())
-//                .build();
-//
-//        feedRepository.save(feed);
-//
-//        String textData = "(주인공: " + figure.getName() + ": " + figure.getInfo() + ")\n(등장인물: ";
-//
-//        // 등장인물 정보 붙이기
-//        for(int i = 0; i < figures.size(); i++){
-//            textData += "(" + figures.get(i).getName() + ": " + figures.get(i).getInfo() + ")";
-//            if(i == figures.size() - 1){
-//                break;
-//            }
-//            textData += ", ";
-//        }
-//
-//        textData += ")\n(이야기: ";
-//
-//        for(int i = 0; i < 4; i++){
-//            textData += "(" + toonDto.getContentList().get(i) + ")";
-//            if(i == 3) {
-//                break;
-//            }
-//            textData += ", ";
-//        }
-//
-//        ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
-//                .text(textData)
-//                .build();
-//
-//        System.out.println(sendDto);
-//
-//
-//        Mono<ImageResponseDto> monoImageResponseDto = webClient.post()
-//                .uri("/get_images")
-//                .bodyValue(sendDto)
-//                .retrieve()
-//                .bodyToMono(ImageResponseDto.class);
-//
-//        List<String> imageUrls = Objects.requireNonNull(monoImageResponseDto.block()).getImageUrls();
-//
-//        ToonDto.toonResponseDto toonResponseDto = ToonDto.toonResponseDto.builder()
-//                .feedId(feed.getId())
-//                .imageUrls(imageUrls)
-//                .build();
-//
-//        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, imageUrls));
-//    }
 
     @Override
     @Transactional

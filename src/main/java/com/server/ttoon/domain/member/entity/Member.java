@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class Member extends BaseEntity {
     private String image;
     private int point;
     private String email;
+    private LocalDate createToonDate;
 
 
     public void changeToUser(Member member){
@@ -55,5 +57,9 @@ public class Member extends BaseEntity {
     }
     public void addPoint(){
         this.point += 100;
+    }
+
+    public void updateCreateToonDate(LocalDate createToonDate){
+        this.createToonDate = createToonDate;
     }
 }

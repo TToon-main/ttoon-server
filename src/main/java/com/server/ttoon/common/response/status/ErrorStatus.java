@@ -19,7 +19,8 @@ public enum ErrorStatus {
     FEED_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_7", "해당일에 이미 피드가 존재합니다."),
     ATTENDANCE_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_8", "오늘 이미 출석체크 했습니다."),
     FIGURE_NOT_FOUND_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_9", "존재하지 않는 메인 등장인물입니다."),
-    AI_IMAGE_NONE_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_10", "이미지가 생성되지 않았습니다. 다시 요청해주세요.");
+    AI_BAD_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_10", "AI 서버 요청 실패. 다시 요청해주세요"),
+    REQUEST_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_11", "오늘은 더이상 요청이 불가합니다.");
 
 
     private final HttpStatus httpStatus;

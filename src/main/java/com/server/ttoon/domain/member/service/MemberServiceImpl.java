@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.server.ttoon.common.response.ApiResponse.*;
@@ -343,6 +344,20 @@ public class MemberServiceImpl implements MemberService{
 
 // 페이지된 응답 반환
         return ResponseEntity.ok(onSuccess(_OK, userInfoPagingDtos));
+    }
+
+    @Override
+    public Member findByMemberId(Long memberId) {
+
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+    }
+
+    @Override
+    public void updateCreateToonDate(Member member) {
+
+        member.updateCreateToonDate(LocalDate.now());
+        memberRepository.save(member);
     }
 
     private void appleServiceRevoke(AppleAuthTokenResponse appleAuthToken) throws IOException {
