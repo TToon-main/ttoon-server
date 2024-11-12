@@ -470,5 +470,16 @@ public class FeedServiceImpl implements FeedService{
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<?>> checkTodayFeed() {
 
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+
+        if(feedRepository.existsByMemberAndDate(member, LocalDate.now())){
+           throw new CustomRuntimeException(REQUEST_EXIST_ERROR);
+        }
+        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
+    }
 }

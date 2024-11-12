@@ -29,4 +29,6 @@ public interface FeedService {
     ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto);
 
     ResponseEntity<ApiResponse<?>> completeToon(Long feedId, ToonDto.imageDto imageDto) throws Exception;
+
+    ResponseEntity<ApiResponse<?>> checkTodayFeed();
 }
