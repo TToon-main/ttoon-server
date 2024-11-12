@@ -5,6 +5,8 @@ import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
+import com.server.ttoon.domain.feed.entity.Feed;
+import com.server.ttoon.domain.feed.repository.FeedRepository;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.dto.response.AccountResponseDto;
 import com.server.ttoon.domain.member.dto.response.FriendInfoDto;
@@ -60,6 +62,7 @@ import static com.server.ttoon.common.response.status.SuccessStatus.*;
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
+    private final FeedRepository feedRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RevokeReasonRepository revokeReasonRepository;
     private final S3Service s3Service;
@@ -130,9 +133,6 @@ public class MemberServiceImpl implements MemberService{
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
         RefreshToken refreshToken = refreshTokenRepository.findByMemberId(memberId.toString()).orElse(null);
 
-        if(appleIdentityTokenDto.isEmpty())
-            throw new CustomRuntimeException(BADREQUEST_ERROR);
-
         RevokeReason revokeReason = RevokeReason.builder()
                 .userName(member.getNickName())
                 .reason(appleIdentityTokenDto.get().getRevokeReason())
@@ -140,7 +140,7 @@ public class MemberServiceImpl implements MemberService{
 
         revokeReasonRepository.save(revokeReason);
 
-        if(member.getProvider().equals(Provider.APPLE.toString()) && sender.equals("app"))
+        if(member.getProvider().toString().equals(Provider.APPLE.toString()) && sender.equals("app"))
         {
             if(appleIdentityTokenDto.get().getAuthorizationCode().isEmpty())
                 throw new CustomRuntimeException(BADREQUEST_ERROR);
@@ -149,7 +149,11 @@ public class MemberServiceImpl implements MemberService{
             AppleAuthTokenResponse appleAuthToken = generateAuthToken(code);
             appleServiceRevoke(appleAuthToken);
         }
-        memberRepository.delete(member);
+        List<Feed> feeds = feedRepository.findAllByMember(member);
+        feedRepository.deleteAll(feeds);
+        List<Friend> friends = friendRepository.findAllByInviteeOrInvitor(member,member);
+        friendRepository.deleteAll(friends);
+        memberRepository.deleteById(memberId);
         if(refreshToken != null)
             refreshTokenRepository.delete(refreshToken);
         return ResponseEntity.ok(onSuccess(_OK));
