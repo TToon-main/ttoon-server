@@ -27,17 +27,15 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.server.ttoon.common.response.status.ErrorStatus.*;
@@ -61,6 +59,13 @@ public class FeedServiceImpl implements FeedService{
                 .uri("/get_images")
                 .bodyValue(sendDto)
                 .retrieve()
+                .onStatus(
+                        httpStatusCode -> httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError(),
+                        clientResponse -> {
+                            return clientResponse.bodyToMono(String.class)
+                                    .flatMap(errorBody -> Mono.error(new CustomRuntimeException(AI_BAD_REQUEST_ERROR)));
+                        }
+                )
                 .bodyToMono(ImageResponseDto.class);
     }
 
@@ -369,100 +374,16 @@ public class FeedServiceImpl implements FeedService{
 
 
 
-//    @Override
-//    @Transactional
-//    public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) throws JsonProcessingException {
-//
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
-//
-//        // 임시로 피드 하루 제한 없앰.
-////        if(feedRepository.existsByMemberAndDate(member, LocalDate.now()))
-////            throw new CustomRuntimeException(FEED_EXIST_ERROR);
-//
-//        String content = String.join(" ", toonDto.getContentList());
-//
-//        Feed feed = Feed.builder()
-//                .title(toonDto.getTitle())
-//                .content(content)
-//                .member(member)
-//                .number(toonDto.getNumber()) // 필요에 따라 적절한 값 설정
-//                .likes(0)
-//                .date(LocalDate.now())
-//                .build();
-//
-//        feedRepository.save(feed);
-//
-//        Figure figure = figureRepository.findById(toonDto.getMainCharacterId())
-//                .orElseThrow(() -> new CustomRuntimeException(FIGURE_NOT_FOUND_ERROR));
-//
-//        List<Figure> figures = figureRepository.findAllById(toonDto.getOthers());
-//
-//        String textData = "(주인공: " + figure.getName() + ": " + figure.getInfo() + ")\n(등장인물: ";
-//
-//        // 등장인물 정보 붙이기
-//        for(int i = 0; i < figures.size(); i++){
-//            textData += "(" + figures.get(i).getName() + ": " + figures.get(i).getInfo() + ")";
-//            if(i == figures.size() - 1){
-//                break;
-//            }
-//            textData += ", ";
-//        }
-//
-//        textData += ")\n(이야기: ";
-//
-//        for(int i = 0; i < 4; i++){
-//            textData += "(" + toonDto.getContentList().get(i) + ")";
-//            if(i == 3) {
-//                break;
-//            }
-//            textData += ", ";
-//        }
-//
-//        ToonDto.sendDto sendDto = ToonDto.sendDto.builder()
-//                .text(textData)
-//                .build();
-//
-//
-//        Mono<ImageResponseDto> imageResponseDto = getImageFromAI(sendDto);
-//
-//        // json 데이터 확인용 코드.
-////        ObjectMapper objectMapper = new ObjectMapper();
-////        String jsonData = objectMapper.writeValueAsString(sendDto);
-////        System.out.println(jsonData);
-//
-//        List<String> imageUrls = Objects.requireNonNull(imageResponseDto.block()).getImageUrls();
-//
-//        ToonDto.toonResponseDto toonResponseDto = ToonDto.toonResponseDto.builder()
-//                .feedId(feed.getId())
-//                .imageUrls(imageUrls)
-//                .build();
-//
-//        return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, toonResponseDto));
-//    }
-
-
     @Override
+    @Transactional
     public ResponseEntity<ApiResponse<?>> createToon(Long memberId, ToonDto toonDto) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
-        if(Objects.equals(member.getCreateToonDate(), LocalDate.now())){
-            throw new CustomRuntimeException(REQUEST_EXIST_ERROR);
-        }
-
-
-
-        return null;
-    }
-
-
-    private ResponseEntity<ApiResponse<?>> processToonRequest(Long memberId, ToonDto toonDto) {
-        // 여기에 기존의 createToon 코드 내용이 들어갑니다.
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
+        // 임시로 피드 하루 제한 없앰.
+//        if(feedRepository.existsByMemberAndDate(member, LocalDate.now()))
+//            throw new CustomRuntimeException(FEED_EXIST_ERROR);
 
         String content = String.join(" ", toonDto.getContentList());
 
@@ -470,7 +391,7 @@ public class FeedServiceImpl implements FeedService{
                 .title(toonDto.getTitle())
                 .content(content)
                 .member(member)
-                .number(toonDto.getNumber())
+                .number(toonDto.getNumber()) // 필요에 따라 적절한 값 설정
                 .likes(0)
                 .date(LocalDate.now())
                 .build();
@@ -484,6 +405,7 @@ public class FeedServiceImpl implements FeedService{
 
         String textData = "(주인공: " + figure.getName() + ": " + figure.getInfo() + ")\n(등장인물: ";
 
+        // 등장인물 정보 붙이기
         for(int i = 0; i < figures.size(); i++){
             textData += "(" + figures.get(i).getName() + ": " + figures.get(i).getInfo() + ")";
             if(i == figures.size() - 1){
@@ -506,7 +428,14 @@ public class FeedServiceImpl implements FeedService{
                 .text(textData)
                 .build();
 
+
         Mono<ImageResponseDto> imageResponseDto = getImageFromAI(sendDto);
+
+        // json 데이터 확인용 코드.
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String jsonData = objectMapper.writeValueAsString(sendDto);
+//        System.out.println(jsonData);
+
         List<String> imageUrls = Objects.requireNonNull(imageResponseDto.block()).getImageUrls();
 
         ToonDto.toonResponseDto toonResponseDto = ToonDto.toonResponseDto.builder()
@@ -516,7 +445,6 @@ public class FeedServiceImpl implements FeedService{
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, toonResponseDto));
     }
-
 
     @Override
     @Transactional

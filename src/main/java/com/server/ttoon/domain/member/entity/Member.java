@@ -58,4 +58,8 @@ public class Member extends BaseEntity {
     public void addPoint(){
         this.point += 100;
     }
+
+    public void updateCreateToonDate(LocalDate createToonDate){
+        this.createToonDate = createToonDate;
+    }
 }
