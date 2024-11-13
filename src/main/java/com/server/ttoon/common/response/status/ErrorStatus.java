@@ -20,7 +20,8 @@ public enum ErrorStatus {
     ATTENDANCE_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_8", "오늘 이미 출석체크 했습니다."),
     FIGURE_NOT_FOUND_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_9", "존재하지 않는 메인 등장인물입니다."),
     AI_BAD_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_10", "AI 서버 요청 실패. 다시 요청해주세요"),
-    REQUEST_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_11", "오늘은 더이상 요청이 불가합니다.");
+    REQUEST_EXIST_ERROR(HttpStatus.BAD_REQUEST, "COMMON400_11", "이미 오늘 툰을 생성했습니다.");
+
 
 
     private final HttpStatus httpStatus;

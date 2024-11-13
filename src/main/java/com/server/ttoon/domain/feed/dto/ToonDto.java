@@ -9,6 +9,8 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ToonDto {
     private Long mainCharacterId;
     private List<Long> others;

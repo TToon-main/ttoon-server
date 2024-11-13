@@ -150,5 +150,9 @@ public class FeedController {
         return feedService.completeToon(feedId, imageDto);
     }
 
-
+    @Operation(summary = "당일 피드 생성여부 확인", description = "해당일에 로그인 중인 사용자가 피드 생성했는지 여부를 판단합니다.")
+    @GetMapping("/feeds/check")
+    public ResponseEntity<ApiResponse<?>> checkTodayFeed(){
+        return feedService.checkTodayFeed();
+    }
 }
