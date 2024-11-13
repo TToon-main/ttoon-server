@@ -477,7 +477,7 @@ public class FeedServiceImpl implements FeedService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(MEMBER_NOT_FOUND_ERROR));
 
-        if(feedRepository.existsByMemberAndDate(member, LocalDate.now())){
+        if(Objects.equals(member.getCreateToonDate(), LocalDate.now())){
            throw new CustomRuntimeException(REQUEST_EXIST_ERROR);
         }
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
