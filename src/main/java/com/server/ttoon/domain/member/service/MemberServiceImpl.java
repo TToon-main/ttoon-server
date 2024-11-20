@@ -15,6 +15,7 @@ import com.server.ttoon.domain.member.dto.response.FriendInfoDto;
 import com.server.ttoon.domain.member.dto.response.UserInfoDto;
 import com.server.ttoon.domain.member.entity.*;
 import com.server.ttoon.domain.member.repository.FriendRepository;
+import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.domain.member.repository.RevokeReasonRepository;
 import com.server.ttoon.security.jwt.dto.request.AuthorizationCodeDto;
@@ -72,6 +73,7 @@ public class MemberServiceImpl implements MemberService{
     private final AppleProperties appleProperties;
     private final FriendRepository friendRepository;
     private final FigureRepository figureRepository;
+    private final MemberLikesRepository memberLikesRepository;
 
     // 프로필 + 계정 정보 조회 메소드
     public ResponseEntity<ApiResponse<?>> getAccountInfo(Long memberId){
@@ -153,6 +155,8 @@ public class MemberServiceImpl implements MemberService{
             AppleAuthTokenResponse appleAuthToken = generateAuthToken(code);
             appleServiceRevoke(appleAuthToken);
         }
+        List<MemberLikes> memberLikes = memberLikesRepository.findAllByMember(member);
+        memberLikesRepository.deleteAll(memberLikes);
         List<Feed> feeds = feedRepository.findAllByMember(member);
         feedRepository.deleteAll(feeds);
         List<Friend> friends = friendRepository.findAllByInviteeOrInvitor(member,member);
