@@ -6,7 +6,9 @@ import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
 import com.server.ttoon.domain.feed.entity.Feed;
+import com.server.ttoon.domain.feed.entity.Figure;
 import com.server.ttoon.domain.feed.repository.FeedRepository;
+import com.server.ttoon.domain.feed.repository.FigureRepository;
 import com.server.ttoon.domain.member.dto.request.ModifyRequestDto;
 import com.server.ttoon.domain.member.dto.response.AccountResponseDto;
 import com.server.ttoon.domain.member.dto.response.FriendInfoDto;
@@ -69,6 +71,7 @@ public class MemberServiceImpl implements MemberService{
     private final S3Service s3Service;
     private final AppleProperties appleProperties;
     private final FriendRepository friendRepository;
+    private final FigureRepository figureRepository;
 
     // 프로필 + 계정 정보 조회 메소드
     public ResponseEntity<ApiResponse<?>> getAccountInfo(Long memberId){
@@ -154,6 +157,8 @@ public class MemberServiceImpl implements MemberService{
         feedRepository.deleteAll(feeds);
         List<Friend> friends = friendRepository.findAllByInviteeOrInvitor(member,member);
         friendRepository.deleteAll(friends);
+        List<Figure> figures = figureRepository.findAllByMember(member);
+        figureRepository.deleteAll(figures);
         memberRepository.deleteById(memberId);
         if(refreshToken != null)
             refreshTokenRepository.delete(refreshToken);
