@@ -45,6 +45,12 @@ public class HomeServiceImpl implements HomeService{
 
         List<Feed> feedList = feedRepository.findAllByMemberAndDateBetween(member, startDate, endDate);
 
+        for(int i = 0; i < feedList.size(); i++){
+            if(feedList.get(i).getFeedImageList().isEmpty()){
+                feedList.remove(i);
+            }
+        }
+
         List<FeedDto.homeFeedDto> homeFeedDtos = feedList.stream()
                 .map(feed -> FeedDto.homeFeedDto.builder()
                         .feedId(feed.getId())

@@ -363,6 +363,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
+    @Transactional
     public void updateCreateToonDate(Member member) {
 
         member.updateCreateToonDate(LocalDate.now());
