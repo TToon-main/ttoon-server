@@ -10,7 +10,6 @@ import com.server.ttoon.domain.feed.service.FeedService;
 import com.server.ttoon.domain.feed.service.RequestQueueProcessor;
 import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -20,9 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Tag(name = "Feed API", description = "피드 관련 기능")
 @RestController
@@ -133,12 +132,10 @@ public class FeedController {
         Long memberId = SecurityUtil.getCurrentMemberId();
 
         try{
-            requestQueueProcessor.addTask(memberId);
-        } catch (InterruptedException e) {
+            return requestQueueProcessor.addTask(memberId, toonDto);
+        } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-
-        return feedService.createToon(memberId, toonDto);
     }
 
     @Operation(summary = "기록 추가(이미지 선택 완료)", description = "사용자가 4개의 컷 모두 선택 완료했을 때 요청하는 API.")

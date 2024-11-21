@@ -19,6 +19,7 @@ import com.server.ttoon.domain.member.entity.Status;
 import com.server.ttoon.domain.member.repository.FriendRepository;
 import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.domain.member.repository.MemberRepository;
+import com.server.ttoon.domain.member.service.MemberService;
 import com.server.ttoon.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +52,7 @@ public class FeedServiceImpl implements FeedService{
     private final FeedImageRepository feedImageRepository;
     private final MemberLikesRepository memberLikesRepository;
     private final FriendRepository friendRepository;
+    private final MemberService memberService;
     private final S3Service s3Service;
     private final WebClient webClient;
 
@@ -178,8 +180,16 @@ public class FeedServiceImpl implements FeedService{
 
             Slice<Feed> feedSlice = feedRepository.findAllByMemberOrFriends(member, friendList, pageable);
 
+            feedList = feedSlice.stream().toList();
+
+            for(int i = 0 ; i < feedList.size(); i++){
+                if(feedList.get(i).getFeedImageList().isEmpty()){
+                    feedList.remove(i);
+                }
+            }
+
             // feedSlice 를 DTO 타입 리스트로 변환하기
-            List<FeedDto> feedDtoList = feedSlice.stream()
+            List<FeedDto> feedDtoList = feedList.stream()
                     .map(feed -> FeedDto.builder()
                             .feedId(feed.getId())
                             .writerName(feed.getMember().getNickName())
@@ -201,6 +211,14 @@ public class FeedServiceImpl implements FeedService{
         else{ // 나만 보기 bool 값 1일 때 -> 내 피드만 보고 싶을 때
 
             Slice<Feed> feedSlice = feedRepository.findAllByMember(member, pageable);
+
+            List<Feed> feedList = feedSlice.stream().toList();
+
+            for(int i = 0 ; i < feedList.size(); i++){
+                if(feedList.get(i).getFeedImageList().isEmpty()){
+                    feedList.remove(i);
+                }
+            }
 
             // feedSlice 를 DTO 타입 리스트로 변환하기
             List<FeedDto> feedDtoList = feedSlice.stream()
@@ -442,6 +460,8 @@ public class FeedServiceImpl implements FeedService{
                 .feedId(feed.getId())
                 .imageUrls(imageUrls)
                 .build();
+
+        memberService.updateCreateToonDate(member);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK, toonResponseDto));
     }

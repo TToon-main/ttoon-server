@@ -1,23 +1,31 @@
 package com.server.ttoon.domain.feed.service;
 
+import com.server.ttoon.common.response.ApiResponse;
+import com.server.ttoon.domain.feed.dto.ToonDto;
 import com.server.ttoon.domain.member.service.MemberService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 @RequiredArgsConstructor
 public class RequestQueueProcessor {
 
-    private final BlockingQueue<Runnable> blockingQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<CheckUpdateTask> blockingQueue = new LinkedBlockingQueue<>();
+    private final FeedService feedService;
     private final MemberService memberService;
 
-    public void addTask(Long memberId) throws InterruptedException {
-        CheckUpdateTask task = new CheckUpdateTask(memberService, memberId);
+    public ResponseEntity<ApiResponse<?>> addTask(Long memberId, ToonDto toonDto) throws InterruptedException, ExecutionException {
+        CompletableFuture<ResponseEntity<ApiResponse<?>>> completableFuture = new CompletableFuture<>();
+        CheckUpdateTask task = new CheckUpdateTask(memberService, feedService, memberId, toonDto, completableFuture);
         blockingQueue.put(task);
+        return completableFuture.get();
     }
 
     @PostConstruct
@@ -25,7 +33,7 @@ public class RequestQueueProcessor {
         Thread processThread = new Thread(() -> {
             try{
                 while(true){
-                    Runnable request = blockingQueue.take();
+                    CheckUpdateTask request = blockingQueue.take();
                     request.run();
                 }
             } catch (InterruptedException e) {
