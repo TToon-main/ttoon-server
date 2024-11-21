@@ -8,6 +8,7 @@ import com.server.ttoon.domain.feed.dto.CharacterDto;
 import com.server.ttoon.domain.feed.dto.ToonDto;
 import com.server.ttoon.domain.feed.service.FeedService;
 import com.server.ttoon.domain.feed.service.RequestQueueProcessor;
+import com.server.ttoon.domain.member.repository.MemberLikesRepository;
 import com.server.ttoon.security.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +33,7 @@ public class FeedController {
     private final FeedService feedService;
     private final S3Service s3Service;
     private final RequestQueueProcessor requestQueueProcessor;
+    private final MemberLikesRepository memberLikesRepository;
 
     @Operation(summary = "피드 화면 조회", description = "피드 화면상의 데이터를 전달합니다.")
     @GetMapping("/feeds")
