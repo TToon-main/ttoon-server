@@ -77,6 +77,10 @@ public class HomeServiceImpl implements HomeService{
 
         List<FeedImage> feedImageList = feedImageRepository.findAllByFeed(feed);
 
+        if(feedImageList.isEmpty()){
+            return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus._OK));
+        }
+
         FeedDto feedDto = FeedDto.builder()
                 .title(feed.getTitle())
                 .feedId(feed.getId())
