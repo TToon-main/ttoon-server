@@ -376,7 +376,7 @@ public class MemberServiceImpl implements MemberService{
             String revokeUrl = "https://appleid.apple.com/auth/revoke";
 
             LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("client_id", "com.TTOON.dev"); // 클라이언트 ID
+            params.add("client_id", "com.TTOON.prod"); // 클라이언트 ID
             params.add("client_secret", createClientSecret());
             params.add("token", appleAuthToken.getAccessToken());
 
@@ -396,7 +396,7 @@ public class MemberServiceImpl implements MemberService{
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("code", code);
-        params.add("client_id", "com.TTOON.dev");
+        params.add("client_id", "com.TTOON.prod");
         params.add("client_secret", createClientSecret());
         params.add("grant_type", "authorization_code");
 
@@ -435,7 +435,7 @@ public class MemberServiceImpl implements MemberService{
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 5))) // 만료 시간
                 .setAudience(appleProperties.getUrl())
-                .setSubject("com.TTOON.dev")
+                .setSubject("com.TTOON.prod")
                 .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
                 .compact();
     }
