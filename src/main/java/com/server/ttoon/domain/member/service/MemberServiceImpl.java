@@ -410,7 +410,7 @@ public class MemberServiceImpl implements MemberService{
             return response.getBody();
         } catch (HttpClientErrorException e) {
             String errorMessage = e.getResponseBodyAsString(); // Apple 서버에서 반환한 에러 메시지
-            log.error("Apple Auth Token Error: {}", errorMessage); // 로그 기록
+            log.error("Apple Auth Token Error:{}", errorMessage); // 로그 기록
             throw new IllegalArgumentException("Apple Auth Token Error");
         }
     }
