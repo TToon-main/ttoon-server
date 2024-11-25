@@ -4,10 +4,10 @@ import com.server.ttoon.common.exception.CustomRuntimeException;
 import com.server.ttoon.common.response.ApiResponse;
 import com.server.ttoon.common.response.status.ErrorStatus;
 import com.server.ttoon.common.response.status.SuccessStatus;
+import com.server.ttoon.domain.feed.repository.FeedRepository;
+import com.server.ttoon.domain.member.entity.*;
+import com.server.ttoon.domain.member.repository.FriendRepository;
 import com.server.ttoon.security.jwt.dto.request.OAuth2LoginReqDto;
-import com.server.ttoon.domain.member.entity.Authority;
-import com.server.ttoon.domain.member.entity.Member;
-import com.server.ttoon.domain.member.entity.Provider;
 import com.server.ttoon.domain.member.repository.MemberRepository;
 import com.server.ttoon.security.auth.PrincipalDetails;
 import com.server.ttoon.security.jwt.TokenProvider;
@@ -36,6 +36,7 @@ public class AppAuthServiceImpl implements AppAuthService{
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final FriendRepository friendRepository;
 
     // 이용 약관 동의 후 회원가입 로직, 권한 ROLE_USER 로 변경
     @Transactional
@@ -108,7 +109,26 @@ public class AppAuthServiceImpl implements AppAuthService{
                     .authority(Authority.ROLE_GUEST)
                     .build();
 
-             memberRepository.save(member);
+            Member savedMember = memberRepository.save(member);
+
+            Member masterMember = memberRepository.findByNickName("friend_1").get();
+            //테스트용 마스터 친구 맺기
+            Friend masterfriend = Friend.builder()
+                    .invitee(savedMember)
+                    .invitor(masterMember)
+                    .status(Status.ACCEPT)
+                    .build();
+            friendRepository.save(masterfriend);
+
+            //테스트용 요청 친구 맺기
+            Member requestMember = memberRepository.findByNickName("requested_user_1").get();
+
+            Friend requestFriend = Friend.builder()
+                    .invitee(savedMember)
+                    .invitor(requestMember)
+                    .status(Status.WAITING)
+                    .build();
+            friendRepository.save(requestFriend);
 
             // 토큰 생성 로직
             List<GrantedAuthority> authorities = new ArrayList<>();
