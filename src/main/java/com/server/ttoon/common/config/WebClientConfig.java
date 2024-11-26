@@ -19,7 +19,7 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(WebClient.Builder builder){
         return builder
-                .baseUrl("http://43.203.252.187:5000")
+                .baseUrl("http://43.203.209.14:5000")
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 300000)
                         .doOnConnected(conn -> conn
