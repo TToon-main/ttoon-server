@@ -212,11 +212,11 @@ public class FeedServiceImpl implements FeedService{
 
             Slice<Feed> feedSlice = feedRepository.findAllByMember(member, pageable);
 
-            List<Feed> feedList = feedSlice.stream().toList();
+            List<Feed> feedList = new ArrayList<>(feedSlice.stream().toList());
 
-            for(int i = 0 ; i < feedList.size(); i++){
-                if(feedList.get(i).getFeedImageList().isEmpty()){
-                    feedList.remove(i);
+            for (int i = 0; i < feedList.size(); i++) {
+                if (feedList.get(i).getFeedImageList().isEmpty()) {
+                    feedList.remove(i); // 수정 가능
                 }
             }
 
