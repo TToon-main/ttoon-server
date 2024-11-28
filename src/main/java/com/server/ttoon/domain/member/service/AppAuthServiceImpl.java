@@ -109,27 +109,7 @@ public class AppAuthServiceImpl implements AppAuthService{
                     .authority(Authority.ROLE_GUEST)
                     .build();
 
-            Member savedMember = memberRepository.save(member);
-
-            Member masterMember = memberRepository.findByNickName("friend_1").get();
-            //테스트용 마스터 친구 맺기
-            Friend masterfriend = Friend.builder()
-                    .invitee(savedMember)
-                    .invitor(masterMember)
-                    .status(Status.ACCEPT)
-                    .build();
-            friendRepository.save(masterfriend);
-
-            //테스트용 요청 친구 맺기
-            Member requestMember = memberRepository.findByNickName("requested_user_1").get();
-
-            Friend requestFriend = Friend.builder()
-                    .invitee(savedMember)
-                    .invitor(requestMember)
-                    .status(Status.WAITING)
-                    .build();
-            friendRepository.save(requestFriend);
-
+           memberRepository.save(member);
             // 토큰 생성 로직
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(member.getAuthority().toString()));
